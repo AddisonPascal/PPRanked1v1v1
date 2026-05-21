@@ -212,8 +212,6 @@ class MyClient(discord.Client):
         boot_time = time.time();
         
         
-        savedata()
-        
         print('Ranked 1v1v1 bot active')
         
         # Get channel objects
@@ -319,7 +317,6 @@ class MyClient(discord.Client):
         
             state.queue_active = True
             state.queue_pairing = False
-            savedata()
         
             await c_queue.send("The queue has been opened. Type `pp!join` to join!")
             await c_log.send("Admin queue open")
@@ -598,6 +595,8 @@ class MyClient(discord.Client):
                     discord_id=message.author.id,
                     ign=pign
                 )
+                
+                savedata()
         
                 try:
                     await s_server.get_member(message.author.id).add_roles(
@@ -607,7 +606,6 @@ class MyClient(discord.Client):
                     pass
         
                 await c_log.send("Player added to database: " + str(message.author.id))
-                savedata()
         
             # If 2 people are already queued, this player starts the match.
             if state.queue_size() == 2:
@@ -691,7 +689,6 @@ class MyClient(discord.Client):
         
             # Otherwise add to queue
             state.add_to_queue(message.author.id)
-            savedata()
         
             queue_size = state.queue_size()
         
