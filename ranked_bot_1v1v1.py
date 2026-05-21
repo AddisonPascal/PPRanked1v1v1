@@ -136,20 +136,16 @@ class RankedState:
             + 1
         )
 
-#def process_result(
-
 # Load data file
-if False:
-    try:
-        dat = pickle.load(open('data.pickle', 'rb'))
+try:
+    dat = pickle.load(open("data.pickle", "rb"))
+    state = RankedState(dat[0], dat[1], dat[2], dat[3])
+except Exception as e:
+    print("Error loading database:", e)
+    input("Continue to create new one")
+    state = RankedState()
+    pickle.dump([state.players, state.current_matches, state.flagged_matches, state.historic_matches], open("data.pickle", "wb"))
         
-        state = RankedState(dat[0], dat[1], dat[2], dat[3])
-        
-        
-    except:
-        print("Error loading database")
-        input()
-        exit()
         
 # Get IGN from discord ID in database
 def ign(disc):
