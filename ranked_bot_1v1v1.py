@@ -670,10 +670,13 @@ class MyClient(discord.Client):
                 )
         
                 await channel.send(
-                    "Play your 1v1v1 match now!\n"
-                    "When finished, enter results like `pp!score a`, `pp!score ab`, or `pp!score tt c`.\n"
-                    "`t` means a tied game. `a`, `b`, and `c` are the players who won the final game.\n"
-                    "All 3 players must confirm with `pp!score confirm`."
+                    "**Play your 1v1v1 match (normal mode no pwps) now!**\n"
+                    "Whoever makes it to the furthest round wins the match (can be 2 people)! If there are 3 ties the match is tied.\n"
+                    "When you are done, one player must enter the results, for example `pp!score t ab` - "
+                    "t for each tie followed by the letters of each player that won in the final game.\n"
+                    "The other players must then confirm with `pp!score confirm`.\n\n"
+                    "If lag or interference affects the result, the game should be restarted. *If you collect a powerup, that's considered dying on the round you collect it.*\n"
+                    "*In any disputes, ping a Referee in #ranked-chat. If someone leaves or doesn't show up, do `pp!flag`*"
                 )
         
                 await c_results.send(
