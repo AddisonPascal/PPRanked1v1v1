@@ -105,7 +105,7 @@ class Result:
 
 #def process_result(
 
-
+# Load data file
 if True:
     try:
         dat = pickle.load(open('data.pickle', 'rb'))
@@ -118,15 +118,14 @@ if True:
         input()
         exit()
         
- 
+# Get IGN from discord ID in database
 def ign(disc):
     try:
         return EloLookup.ign(disc)
     except:
         return None
         
-
-    
+# Save data
 def savedata():
     global players
     global current_matches
@@ -137,8 +136,10 @@ def savedata():
         
         
         
-
+# Discord bot
 class MyClient(discord.Client):
+    
+    # Init
     async def on_ready(self):
         global boot_time
         global c_log
@@ -155,6 +156,8 @@ class MyClient(discord.Client):
         
         print('Ranked 1v1v1 bot active')
         
+        # Get channel objects
+        
         c_log = self.get_channel(cf.LOGCHANNEL)
         c_queue = self.get_channel(cf.QUEUECHANNEL)
         c_results = self.get_channel(cf.RESULTSCHANNEL)
@@ -165,7 +168,9 @@ class MyClient(discord.Client):
         
         await c_log.send("1v1v1 Bot Ready")
         
+      
         
+    # On Message
     async def on_message(self, message):
         global boot_time
         global players
@@ -180,6 +185,7 @@ class MyClient(discord.Client):
         global queue_2_join
         
         
+        # Delete messages in queue channel if not admin or queue command
         if message.channel.id==cf.QUEUECHANNEL and message.content not in ['pp!join', 'pp!leave'] and message.author.id not in cf.ADMINS:
             try:
                 await message.delete()
@@ -187,7 +193,7 @@ class MyClient(discord.Client):
                 pass
             return
             
-            
+        # Delete bot replies to queue commands
         if message.author.id in [998175193778372659, 1263039458475901021]:
             if "you have left the queue" in message.content or "you are not in the queue" in message.content or "queue is closed right now" in message.content or "you are in an ongoing match" in message.content or "you are already in the queue" in message.content or "you have joined the queue" in message.content:
                 await asyncio.sleep(10)
@@ -202,11 +208,11 @@ class MyClient(discord.Client):
                 except:
                     pass
                     
-                    
+        # Send discord server invite
         if message.content=="pp!invite":
             await message.channel.send("https://discord.gg/NwE75sqvxg")
             
-            
+        # pp!run admin command
         if message.content.startswith("pp!run!"):
             if message.author.id != 374496541819404299:
                 await message.channel.send("You do not have permission to do that!")
@@ -217,6 +223,7 @@ class MyClient(discord.Client):
             except:
                 await message.channel.send("Exception")
                 
+        # pp!echo admin command
         if message.content.startswith("pp!echo!"):
             if message.author.id != 374496541819404299:
                 await message.channel.send("You do not have permission to do that!")
@@ -225,7 +232,8 @@ class MyClient(discord.Client):
                 await message.channel.send(str(eval(message.content[8:])))
             except:
                 await message.channel.send("Exception")
-                
+        
+        # pp!verify - Verify player by setting nick
         if message.content.startswith("pp!verify "):
             if message.author.id not in cf.VERIFIERS:
                 await message.channel.send("You do not have permission to do that!")
@@ -251,6 +259,7 @@ class MyClient(discord.Client):
             except:
                 await message.channel.send("Error verifying user. ")
                 
+        # pp!open - open the queue
         if message.content=="pp!open":
             if message.author.id not in cf.ADMINS:
                 await message.channel.send("You do not have permission to do that!")
@@ -262,7 +271,8 @@ class MyClient(discord.Client):
             queue_pairing = False
             await c_queue.send("The queue has been opened. Type `pp!join` to join!")
             await c_log.send("Admin queue open")
-            
+        
+        # pp!close - close the queue
         if message.content=="pp!close":
             if message.author.id not in cf.ADMINS:
                 await message.channel.send("You do not have permission to do that!")
@@ -285,6 +295,7 @@ class MyClient(discord.Client):
             await c_queue.send("The queue has been closed. ")
             await c_log.send("Admin queue close")
             
+        # pp!status - get status of bot
         if message.content=="pp!status":
             embedVar = discord.Embed(title = "Status", description = '', color = 0xffffff)
             embedVar.add_field(name="Uptime", value=str(math.floor(time.time()-boot_time)))
