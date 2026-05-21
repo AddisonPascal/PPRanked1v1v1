@@ -543,3 +543,63 @@ class MyClient(discord.Client):
         
             await c_log.send("Player joined queue: " + str(message.author.id))
             return
+            
+            
+        # pp!leave - leave the queue
+        if message.content == "pp!leave":
+            if state.queue_pairing:
+                await message.channel.send("You cannot leave the queue right now, a match is starting!")
+                await try_delete(message)
+                return
+
+            if not state.in_queue(message.author.id):
+                await message.channel.send("<@" + str(message.author.id) + ">, you are not in the queue.")
+                await try_delete(message)
+                return
+
+            if state.queue_1_player == message.author.id:
+                waited = time.time() - state.queue_1_join
+
+                if waited < 30:
+                    await message.channel.send(
+                        "You cannot leave the queue right now, please wait "
+                        + str(round(30 - waited))
+                        + " more seconds!"
+                    )
+                    await try_delete(message)
+                    return
+
+                state.players[message.author.id].queuetime += waited
+                state.queue_1_player = 0
+                state.queue_1_join = 0
+
+            elif state.queue_2_player == message.author.id:
+                waited = time.time() - state.queue_2_join
+
+                if waited < 30:
+                    await message.channel.send(
+                        "You cannot leave the queue right now, please wait "
+                        + str(round(30 - waited))
+                        + " more seconds!"
+                    )
+                    await try_delete(message)
+                    return
+
+                state.players[message.author.id].queuetime += waited
+                state.queue_2_player = 0
+                state.queue_2_join = 0
+
+            savedata()
+
+            queue_size = state.queue_size()
+
+            if queue_size == 1:
+                await c_queue.send("There is now 1 player in the queue! Type `pp!join` to join!")
+            else:
+                await c_queue.send("There are now " + str(queue_size) + " players in the queue! Type `pp!join` to join!")
+
+            await message.channel.send("<@" + str(message.author.id) + ">, you have left the queue!")
+            await try_delete(message)
+
+            await c_log.send("Player left queue: " + str(message.author.id))
+            return
