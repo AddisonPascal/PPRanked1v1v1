@@ -47,6 +47,34 @@ class Result:
     ties: int
     winners: set[int]
     
+    def human(self, match, players):
+        out = ""
+    
+        for i in range(self.ties):
+            out += "Game " + str(i + 1) + ": Tie\n"
+    
+        if self.voided:
+            out += "Match voided"
+            return out
+    
+        if len(self.winners) == 0:
+            out += "**Winner: Tie**"
+            return out
+    
+        winner_names = []
+    
+        for pid in match.players:
+            if pid in self.winners:
+                winner_names.append(players[pid].ign.replace("_", "\\_"))
+    
+        if len(winner_names) == 1:
+            out += "**Winner: " + winner_names[0] + "**"
+        else:
+            out += "**Winners: " + ", ".join(winner_names) + "**"
+    
+        return out
+        
+    
     @classmethod
     def parse(cls, string, match, is_admin=False):
         voided = False
@@ -83,6 +111,7 @@ class Result:
         if len(winners) == 3: return None
 
         return cls(voided=False, ties=ties, winners=winners)
+        
 
 @dataclass
 class Match:
