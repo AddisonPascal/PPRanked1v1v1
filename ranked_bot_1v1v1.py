@@ -355,15 +355,22 @@ class MyClient(discord.Client):
             return
             
         # pp!status - get status of bot
-        if message.content=="pp!status":
-            embedVar = discord.Embed(title = "Status", description = '', color = 0xffffff)
-            embedVar.add_field(name="Uptime", value=str(math.floor(time.time()-boot_time)))
-            embedVar.add_field(name="Queue open", value=str(queue_active))
-            embedVar.add_field(name="Total ranked players", value=str(len(players)))
-            embedVar.add_field(name="Active matches", value=str(len(current_matches)))
-            embedVar.add_field(name="Flagged matches", value=str(len(flagged_matches)))
-            embedVar.add_field(name="Completed matches", value=str(len(historic_matches)))
+        if message.content == "pp!status":
+            embedVar = discord.Embed(title="Status", color=0xffffff)
+
+            for name, value in [
+                ("Uptime", math.floor(time.time() - boot_time)),
+                ("Queue open", state.queue_active),
+                ("Players in queue", state.queue_size()),
+                ("Total ranked players", len(state.players)),
+                ("Active matches", len(state.current_matches)),
+                ("Flagged matches", len(state.flagged_matches)),
+                ("Completed matches", len(state.historic_matches)),
+            ]:
+                embedVar.add_field(name=name, value=str(value))
+
             await message.channel.send(embed=embedVar)
+            return
             
          
         if message.content == "pp!join":
