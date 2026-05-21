@@ -420,7 +420,9 @@ class MyClient(discord.Client):
             savedata()
 
             await message.channel.send("Entered Results: \n"+result.human(match, state.players)+"\nPlease confirm these results by typing `pp!score confirm`. If there is a mistake enter results again with `pp!score`")
-
+            
+            await c_log.send("Player "+str(message.author.id)+" entered results for "+str(message.channel.id))
+            
             return
             
          
