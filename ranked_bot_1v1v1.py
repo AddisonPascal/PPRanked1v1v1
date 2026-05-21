@@ -178,10 +178,27 @@ async def try_delete_after(message, seconds):
         
 # Discord bot
 class MyClient(discord.Client):
-    
+
     async def finalise_match(self, match: Match):
-        ...
-        
+        match.end_time = time.time()
+
+        if match.channel_id in state.current_matches:
+            del state.current_matches[match.channel_id]
+
+        if match.channel_id in state.flagged_matches:
+            del state.flagged_matches[match.channel_id]
+
+        state.historic_matches[match.channel_id] = match
+
+        savedata()
+
+        await c_results.send(match.human(state.players))
+        await c_log.send("Match " + str(match.num) + " finalised")
+
+        #todo delete
+        channel = self.get_channel(match.channel_id)
+        if channel is not None:
+            await channel.send("Match finalised.")
     
     # Init
     async def on_ready(self):
