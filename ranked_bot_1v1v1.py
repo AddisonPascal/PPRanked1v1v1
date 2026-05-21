@@ -685,8 +685,15 @@ class MyClient(discord.Client):
                     + "B: " + state.players[pB].ign.replace("_", "\\_") + "\n"
                     + "C: " + state.players[pC].ign.replace("_", "\\_")
                 )
+                
+                
+                await message.channel.send(
+                    "<@" + str(message.author.id) + ">, you have joined the queue! Match started."
+                )
         
                 await try_delete(message)
+                
+                
         
                 return
         
