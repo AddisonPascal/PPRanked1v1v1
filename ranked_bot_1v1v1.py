@@ -400,6 +400,8 @@ class MyClient(discord.Client):
             embed.add_field(name="Match Ties", value=str(p.ties))
             embed.add_field(name="Match Losses", value=str(p.losses))
             embed.add_field(name="Time in Queue", value=str(math.floor(p.queuetime / 60)) + " min")
+            embed.add_field(name="TrueSkill", value=str(round(rating.display_rating(p), 2)))
+
 
             embed.set_thumbnail(url="https://mc-heads.net/avatar/" + p.ign)
 
