@@ -59,11 +59,9 @@ class Match:
     def is_confirmed(self):
         return len(self.confirmers)==3
         
-        
+@dataclass
 class Result:
-    def __init__(self, voided, num_ties, a_won, b_won, c_won):
-        self.voided = voided
-        self.num_ties = num_ties
-        self.a_won = a_won
-        self.b_won = b_won
-        self.c_won = c_won
+    voided: bool
+    ties: int
+    winners: set[int]
+    
