@@ -179,3 +179,23 @@ def apply_match_stats(match: Match, players: dict[int, Player]):
             players[pid].wins += 1
         else:
             players[pid].losses += 1
+            
+def player_result_in_match(player_id, match):
+    result = match.result
+
+    if result is None:
+        return None
+
+    if result.voided:
+        return None
+
+    if player_id not in match.players:
+        return None
+
+    if len(result.winners) == 0:
+        return "tie"
+
+    if player_id in result.winners:
+        return "win"
+
+    return "loss"
