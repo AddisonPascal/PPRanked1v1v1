@@ -3,6 +3,8 @@ import math
 import time
 import random
 
+from dataclasses import dataclass
+
 ## Player format
 # discord_id: {'ign': 'ign', 'rank': 0, 'wins': 0, 'ties': 0, 'losses': 0, 'queuetime': 0, 'mu': 25, 'sigma': 8.333333333333334}
 
@@ -21,32 +23,42 @@ import random
 # (voided, num_ties, a_won, b_won, c_won)
 
 # Player class to hold player data
+@dataclass
 class Player:
-    def __init__(self, discord_id, ign, rank=0, wins=0, ties=0, losses=0, queuetime=0, mu=25, sigma=8.333333333333334):
-        self.discord_id = discord_id
-        self.ign = ign
-        self.rank = rank
-        self.wins = wins
-        self.ties = ties
-        self.losses = losses
-        self.queuetime = queuetime
-        self.mu = mu
-        self.sigma = sigma
+    discord_id: int
+    ign: str
+    
+    rank: int = 0
+    
+    wins: int = 0
+    ties: int = 0
+    losses: int = 0
+    
+    queuetime: float = 0
+    
+    mu: float = 25
+    sigma: float = 8.333333333333334
 
-
-# 
+@dataclass
 class Match:
-    def __init__(self, channel_id, a_id, b_id, c_id, a_confirmed, b_confirmed, c_confirmed, result, start_time, end_time):
-        self.channel_id = channel_id
-        self.a_id = a_id
-        self.b_id = b_id
-        self.c_id = c_id
-        self.a_confirmed = a_confirmed
-        self.b_confirmed = b_confirmed
-        self.c_confirmed = c_confirmed
-        self.result = result
-        self.start_time = start_time
-        self.end_time = end_time
+    num: int
+    channel_id: int
+    players: list[int]
+    confirmers: set[int]
+    result: Result | None
+    
+    start_time: float
+    end_time: float = 0
+    
+    def has_player(self, player_id):
+        return player_id in self.players
+        
+    def confirm(self, player_id):
+        self.confirmers.add(player_id)
+        
+    def is_confirmed(self):
+        return len(self.confirmers)==3
+        
         
 class Result:
     def __init__(self, voided, num_ties, a_won, b_won, c_won):
