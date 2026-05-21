@@ -51,11 +51,18 @@ queue_2_join = 0
 
 
 class RankedState:
-    def __init__(self):
-        self.players = {}
-        self.current_matches = {}
-        self.flagged_matches = {}
-        self.historic_matches = {}
+    def __init__(self, players={}, current_matches={}, flagged_matches={}, historic_matches={}):
+        self.players = players
+        self.current_matches = current_matches
+        self.flagged_matches = flagged_matches
+        self.historic_matches = historic_matches
+        
+        self.queue_active = False
+        self.queue_pairing = False
+        self.queue_1_player = 0
+        self.queue_1_join = 0
+        self.queue_2_player = 0
+        self.queue_2_join = 0
         
 
 
@@ -65,10 +72,10 @@ class RankedState:
 if True:
     try:
         dat = pickle.load(open('data.pickle', 'rb'))
-        players=dat[0]
-        current_matches=dat[1]
-        flagged_matches=dat[2]
-        historic_matches=dat[3]
+        
+        state = RankedState(dat[0], dat[1], dat[2], dat[3])
+        
+        
     except:
         print("Error loading database")
         input()
