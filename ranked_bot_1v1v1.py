@@ -506,7 +506,7 @@ class MyClient(discord.Client):
                     + " ("
                     + cf.rank_names[p.rank]
                     + ")"
-                    + " — "
+                    + " - "
                     + str(round(rating.display_rating(p), 2))
                 )
 
