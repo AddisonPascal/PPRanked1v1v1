@@ -115,12 +115,13 @@ def ign(disc):
         
 # Save data
 def savedata():
-    global players
-    global current_matches
-    global flagged_matches
-    global historic_matches
-    data = [players, current_matches, flagged_matches, historic_matches]
-    pickle.dump(data, open('data.pickle', 'wb'))
+    data = [
+        state.players,
+        state.current_matches,
+        state.flagged_matches,
+        state.historic_matches
+    ]
+    pickle.dump(data, open("data.pickle", "wb"))
     
     
     
