@@ -155,3 +155,24 @@ class Match:
             out += "\n\n*Awaiting confirmation: " + str(len(self.confirmers)) + "/3*"
     
         return out
+        
+        
+def apply_match_stats(match: Match, players: dict[int, Player]):
+    result = match.result
+
+    if result is None:
+        raise RuntimeError("Cannot apply stats for match with no result")
+
+    if result.voided:
+        return
+
+    if len(result.winners) == 0:
+        for pid in match.players:
+            players[pid].ties += 1
+        return
+
+    for pid in match.players:
+        if pid in result.winners:
+            players[pid].wins += 1
+        else:
+            players[pid].losses += 1

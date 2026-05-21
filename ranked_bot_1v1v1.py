@@ -6,7 +6,7 @@ import time
 import random
 
 import ranked
-from ranked import Player, Match, Result
+from ranked import Player, Match, Result, apply_match_stats
 
 import playerlookup
 
@@ -189,6 +189,10 @@ class MyClient(discord.Client):
             del state.flagged_matches[match.channel_id]
 
         state.historic_matches[match.channel_id] = match
+        
+        
+        apply_match_stats(match, state.players)
+        
         savedata()
 
         await c_results.send(match.human(state.players))
