@@ -425,6 +425,39 @@ class MyClient(discord.Client):
             
             return
             
+        # pp!adminscore - admin result entry for flagged matches only
+        if message.content.startswith("pp!adminscore"):
+            if message.author.id not in cf.ADMINS:
+                await message.channel.send("You do not have permission to do that!")
+                return
+
+            if message.channel.id not in state.flagged_matches:
+                await message.channel.send("This is not a flagged match channel.")
+                return
+
+            match = state.flagged_matches[message.channel.id]
+
+            args = message.content[len("pp!adminscore"):].strip()
+
+            result = Result.parse(
+                args,
+                match,
+                is_admin=True
+            )
+
+            if result is None:
+                await message.channel.send("Invalid admin result.")
+                return
+
+            match.result = result
+            match.confirmers = set(match.players)  # force fully confirmed
+            
+            await self.finalise_match(match)
+            
+            await c_log.send("Admin "+str(message.author.id)+" entered results for "+str(message.channel.id))
+            
+            return
+            
          
         if message.content == "pp!join":
             if message.author.id in cf.BANLIST:
