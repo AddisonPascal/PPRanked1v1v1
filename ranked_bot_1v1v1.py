@@ -394,6 +394,7 @@ class MyClient(discord.Client):
 
                 if not match.confirm(message.author.id):
                     await message.channel.send("You have already confirmed these results.")
+                    return
                     
                 
                 if match.is_confirmed():
