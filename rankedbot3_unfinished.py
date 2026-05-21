@@ -58,9 +58,12 @@ class Player:
         self.queuetime = queuetime
         self.mu = mu
         self.sigma = sigma
-        
+
+
+# 
 class Match:
-    def __init__(self, a_id, b_id, c_id, a_confirmed, b_confirmed, c_confirmed, result, start_time, end_time):
+    def __init__(self, channel_id, a_id, b_id, c_id, a_confirmed, b_confirmed, c_confirmed, result, start_time, end_time):
+        self.channel_id = channel_id
         self.a_id = a_id
         self.b_id = b_id
         self.c_id = c_id
