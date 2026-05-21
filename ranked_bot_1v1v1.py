@@ -326,27 +326,33 @@ class MyClient(discord.Client):
             return
         
         # pp!close - close the queue
-        if message.content=="pp!close":
+        if message.content == "pp!close":
             if message.author.id not in cf.ADMINS:
                 await message.channel.send("You do not have permission to do that!")
                 return
-            if not queue_active:
+        
+            if not state.queue_active:
                 await message.channel.send("Queue is already closed")
                 return
-            if queue_pairing:
+        
+            if state.queue_pairing:
                 await message.channel.send("Please wait, a match is starting.")
-            queue_active = False
-            
-            if queue_1_player != 0:
-                players[queue_1_player]['queuetime'] += time.time() - queue_1_join
-            if queue_2_player != 0:
-                players[queue_2_player]['queuetime'] += time.time() - queue_2_join
-             
-            queue_1_player=0
-            queue_2_player=0
+                return
+        
+            state.queue_active = False
+        
+            if state.queue_1_player != 0:
+                state.players[state.queue_1_player].queuetime += time.time() - state.queue_1_join
+        
+            if state.queue_2_player != 0:
+                state.players[state.queue_2_player].queuetime += time.time() - state.queue_2_join
+        
+            state.clear_queue()
             savedata()
-            await c_queue.send("The queue has been closed. ")
+        
+            await c_queue.send("The queue has been closed.")
             await c_log.send("Admin queue close")
+            return
             
         # pp!status - get status of bot
         if message.content=="pp!status":
