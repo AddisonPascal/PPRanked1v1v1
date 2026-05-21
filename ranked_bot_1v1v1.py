@@ -171,10 +171,12 @@ class MyClient(discord.Client):
     
     async def finalise_match(self, match: Match):
         match.end_time = time.time()
-        
+
+        # Update player stats and ratings
         apply_match_stats(match, state.players)
         rating.apply_match_rating(match, state.players)
 
+        # Move match out of active/flagged and into history
         if match.channel_id in state.current_matches:
             del state.current_matches[match.channel_id]
 
@@ -182,15 +184,69 @@ class MyClient(discord.Client):
             del state.flagged_matches[match.channel_id]
 
         state.historic_matches[match.channel_id] = match
-        
-        
-        
+
+        # Update ranks after adding the match to history,
+        # so Bronze/Silver/Gold progression can count this match.
+        rank_messages = []
+
+        for pid in match.players:
+            player = state.players[pid]
+
+            old_rank = player.rank
+            new_rank = rating.rank_for_player(
+                pid,
+                state.players,
+                state.historic_matches
+            )
+
+            if new_rank != old_rank:
+                player.rank = new_rank
+                player.rank_since_match = match.num
+
+                rank_messages.append(
+                    "<@" + str(pid) + "> is now " + cf.rank_names[new_rank] + "!"
+                )
+
+                await c_log.send(
+                    str(pid)
+                    + " rank updated from "
+                    + cf.rank_names[old_rank]
+                    + " to "
+                    + cf.rank_names[new_rank]
+                )
+
+                member = s_server.get_member(pid)
+
+                if member is not None:
+                    try:
+                        old_role = s_server.get_role(cf.rank_roles[old_rank])
+                        new_role = s_server.get_role(cf.rank_roles[new_rank])
+
+                        if old_role is not None:
+                            await member.remove_roles(old_role)
+
+                        if new_role is not None:
+                            await member.add_roles(new_role)
+
+                    except Exception as e:
+                        await c_log.send(
+                            "Failed to update rank role for "
+                            + str(pid)
+                            + ": "
+                            + repr(e)
+                        )
+
         savedata()
 
         await c_results.send(match.human(state.players))
+
+        for msg in rank_messages:
+            await c_results.send(msg)
+
         await c_log.send("Match " + str(match.num) + " finalised")
 
         channel = self.get_channel(match.channel_id)
+
         if channel is not None:
             try:
                 await channel.delete(reason="Match finalised")
