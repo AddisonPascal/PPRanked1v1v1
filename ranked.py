@@ -142,7 +142,14 @@ class Match:
         return "Match " + str(self.num) + "\n**" + names[0] + " vs " + names[1] + " vs " + names[2] + "**\n"
      
     def human(self, players):
-        if self.result is None:
-            return self.header(players) + "No results entered yet"
+        out = self.header(players)
     
-        return self.header(players) + self.result.human(self, players)
+        if self.result is None:
+            return out + "No results entered yet"
+    
+        out += self.result.human(self, players)
+    
+        if not self.is_confirmed():
+            out += "\n\n*Awaiting confirmation: " + str(len(self.confirmers)) + "/3*"
+    
+        return out
