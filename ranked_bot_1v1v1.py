@@ -296,4 +296,195 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embedVar)
             
          
+        if message.content == "pp!join":
+            if message.author.id in cf.BANLIST:
+                await message.channel.send(
+                    "<@" + str(message.author.id) + ">, you may not join the queue as you are currently banned from Ranked."
+                )
+                await c_log.send("Banned player attempted to queue: " + str(message.author.id))
+                try:
+                    await message.delete()
+                except:
+                    pass
+                return
         
+            if not state.queue_active:
+                await message.channel.send("The queue is closed right now.")
+                try:
+                    await message.delete()
+                except:
+                    pass
+                return
+        
+            if state.player_in_current_match(message.author.id):
+                await message.channel.send(
+                    "<@" + str(message.author.id) + ">, you are in an ongoing match. You cannot queue until that match is complete."
+                )
+                try:
+                    await message.delete()
+                except:
+                    pass
+                return
+        
+            if state.in_queue(message.author.id):
+                await message.channel.send(
+                    "<@" + str(message.author.id) + ">, you are already in the queue."
+                )
+                try:
+                    await message.delete()
+                except:
+                    pass
+                return
+        
+            if state.queue_pairing:
+                await message.channel.send("A match is currently starting so you may not join the queue.")
+                try:
+                    await message.delete()
+                except:
+                    pass
+                return
+        
+            # Create player if they do not exist
+            if message.author.id not in state.players:
+                pign = ign(message.author.id)
+        
+                if pign is None:
+                    m_mem = s_server.get_member(message.author.id)
+                    nick = m_mem.nick if m_mem else None
+        
+                    if nick in [None, ""]:
+                        await message.channel.send(
+                            "<@" + str(message.author.id) + ">, you may not join the queue as you are not verified."
+                        )
+                        await c_log.send("Player rejected from joining database: " + str(message.author.id))
+                        try:
+                            await message.delete()
+                        except:
+                            pass
+                        return
+        
+                    pign = nick.split(" ")[-1]
+        
+                state.players[message.author.id] = Player(
+                    discord_id=message.author.id,
+                    ign=pign
+                )
+        
+                try:
+                    await s_server.get_member(message.author.id).add_roles(
+                        s_server.get_role(cf.rank_roles[0])
+                    )
+                except:
+                    pass
+        
+                await c_log.send("Player added to database: " + str(message.author.id))
+                savedata()
+        
+            # If 2 people are already queued, this player starts the match.
+            if state.queue_size() == 2:
+                state.queue_pairing = True
+        
+                queued = state.queue_players()
+                match_players = queued + [message.author.id]
+        
+                # Add queue time for queued players
+                if state.queue_1_player:
+                    state.players[state.queue_1_player].queuetime += time.time() - state.queue_1_join
+        
+                if state.queue_2_player:
+                    state.players[state.queue_2_player].queuetime += time.time() - state.queue_2_join
+        
+                random.shuffle(match_players)
+        
+                match_num = state.next_match_num()
+                new_channel_name = "match-" + str(match_num)
+        
+                overwrites = {
+                    s_server.default_role: discord.PermissionOverwrite(read_messages=False),
+                    s_server.me: discord.PermissionOverwrite(read_messages=True),
+                }
+        
+                for pid in match_players:
+                    member = s_server.get_member(pid)
+                    if member is not None:
+                        overwrites[member] = discord.PermissionOverwrite(read_messages=True)
+        
+                channel = await s_server.create_text_channel(
+                    new_channel_name,
+                    category=c_match,
+                    overwrites=overwrites
+                )
+        
+                match = Match(
+                    num=match_num,
+                    channel_id=channel.id,
+                    players=match_players,
+                    confirmers=set(),
+                    result=None,
+                    start_time=time.time()
+                )
+        
+                state.current_matches[channel.id] = match
+                state.clear_queue()
+                state.queue_pairing = False
+                savedata()
+        
+                pA = match_players[0]
+                pB = match_players[1]
+                pC = match_players[2]
+        
+                await c_queue.send("There are now 0 players in the queue! Type `pp!join` to join!")
+        
+                await channel.send(
+                    "Match " + str(match_num) + " started!\n\n"
+                    + "A: <@" + str(pA) + "> (" + state.players[pA].ign.replace("_", "\\_") + ")\n"
+                    + "B: <@" + str(pB) + "> (" + state.players[pB].ign.replace("_", "\\_") + ")\n"
+                    + "C: <@" + str(pC) + "> (" + state.players[pC].ign.replace("_", "\\_") + ")\n"
+                )
+        
+                await channel.send(
+                    "Play your 1v1v1 match now!\n"
+                    "When finished, enter results like `pp!score a`, `pp!score ab`, or `pp!score tt c`.\n"
+                    "`t` means a tied game. `a`, `b`, and `c` are the players who won the final game.\n"
+                    "All 3 players must confirm with `pp!score confirm`."
+                )
+        
+                await c_results.send(
+                    "Match " + str(match_num) + " started!\n\n"
+                    + "A: " + state.players[pA].ign.replace("_", "\\_") + "\n"
+                    + "B: " + state.players[pB].ign.replace("_", "\\_") + "\n"
+                    + "C: " + state.players[pC].ign.replace("_", "\\_")
+                )
+        
+                try:
+                    await message.delete()
+                except:
+                    pass
+        
+                return
+        
+            # Otherwise add to queue
+            state.add_to_queue(message.author.id)
+            savedata()
+        
+            queue_size = state.queue_size()
+        
+            if queue_size == 1:
+                await c_queue.send("There is now 1 player in the queue! Type `pp!join` to join!")
+            else:
+                await c_queue.send("There are now " + str(queue_size) + " players in the queue! Type `pp!join` to join!")
+        
+            if queue_size == 2 and len(state.current_matches) == 0:
+                await c_queue.send(cf.QUEUEPINGMESSAGE)
+        
+            await message.channel.send(
+                "<@" + str(message.author.id) + ">, you have joined the queue! Do `pp!leave` to leave."
+            )
+        
+            try:
+                await message.delete()
+            except:
+                pass
+        
+            await c_log.send("Player joined queue: " + str(message.author.id))
+            return
