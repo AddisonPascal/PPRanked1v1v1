@@ -109,7 +109,7 @@ if True:
 # Get IGN from discord ID in database
 def ign(disc):
     try:
-        return EloLookup.ign(disc)
+        return playerlookup.ign(disc)
     except:
         return None
         
