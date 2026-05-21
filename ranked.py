@@ -1,6 +1,7 @@
-# this file will have the classes and everything so the bot is just for bot stuff
-
-
+import cf
+import math
+import time
+import random
 
 ## Player format
 # discord_id: {'ign': 'ign', 'rank': 0, 'wins': 0, 'ties': 0, 'losses': 0, 'queuetime': 0, 'mu': 25, 'sigma': 8.333333333333334}
