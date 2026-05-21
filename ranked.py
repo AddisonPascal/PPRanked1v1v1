@@ -29,6 +29,7 @@ class Player:
     ign: str
     
     rank: int = 0
+    rank_since_match: int = 0
     
     wins: int = 0
     ties: int = 0
