@@ -46,6 +46,19 @@ queue_2_join = 0
 # Results:
 # (voided, num_ties, a_won, b_won, c_won)
 
+# Player class to hold player data
+class Player:
+    def __init__(self, discord_id, ign, rank=0, wins=0, ties=0, losses=0, queuetime=0, mu=25, sigma=8.333333333333334):
+        self.discord_id = discord_id
+        self.ign = ign
+        self.rank = rank
+        self.wins = wins
+        self.ties = ties
+        self.losses = losses
+        self.queuetime = queuetime
+        self.mu = mu
+        self.sigma = sigma
+
 
 if True:
     try:
