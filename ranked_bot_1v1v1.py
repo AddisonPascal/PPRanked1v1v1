@@ -308,17 +308,22 @@ class MyClient(discord.Client):
                 await message.channel.send("Error verifying user. ")
                 
         # pp!open - open the queue
-        if message.content=="pp!open":
+        if message.content == "pp!open":
             if message.author.id not in cf.ADMINS:
                 await message.channel.send("You do not have permission to do that!")
                 return
-            if queue_active:
+        
+            if state.queue_active:
                 await message.channel.send("Queue is already open")
                 return
-            queue_active = True
-            queue_pairing = False
+        
+            state.queue_active = True
+            state.queue_pairing = False
+            savedata()
+        
             await c_queue.send("The queue has been opened. Type `pp!join` to join!")
             await c_log.send("Admin queue open")
+            return
         
         # pp!close - close the queue
         if message.content=="pp!close":
