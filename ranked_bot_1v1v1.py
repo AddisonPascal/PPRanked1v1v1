@@ -125,6 +125,9 @@ def savedata():
 # Discord bot
 class MyClient(discord.Client):
     
+    async def finalise_match(match: Match):
+        ...
+    
     # Init
     async def on_ready(self):
         global boot_time
