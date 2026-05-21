@@ -183,7 +183,7 @@ async def try_delete_after(message, seconds):
 # Discord bot
 class MyClient(discord.Client):
     
-    async def finalise_match(match: Match):
+    async def finalise_match(self, match: Match):
         ...
         
     
