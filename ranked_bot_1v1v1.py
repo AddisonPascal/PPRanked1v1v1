@@ -66,6 +66,30 @@ class RankedState:
 
         self.queue_2_player = 0
         self.queue_2_join = 0
+        
+    def queue_size(self):
+        return (self.queue_1_player != 0) + (self.queue_2_player != 0)
+
+    def queue_players(self):
+        out = []
+
+        if self.queue_1_player:
+            out.append(self.queue_1_player)
+
+        if self.queue_2_player:
+            out.append(self.queue_2_player)
+
+        return out
+
+    def in_queue(self, player_id):
+        return player_id in self.queue_players()
+
+    def clear_queue(self):
+        self.queue_1_player = 0
+        self.queue_1_join = 0
+
+        self.queue_2_player = 0
+        self.queue_2_join = 0
 
 #def process_result(
 
