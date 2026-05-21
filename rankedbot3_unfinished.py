@@ -9,8 +9,29 @@ import trueskill
 
 import EloLookup
 
-
+# Config file
 import cf
+
+# Config variables:
+
+# cf.token string
+# cf.rank_names list of strings
+
+# cf.COMMUNITYSERVER server ID
+# cf.COMM_MASTER_ID role ID
+
+# cf.ADMINS list of user IDs
+# cf.VERIFIERS list of user IDs
+# cf.BANLIST list of user IDs
+
+# cf.QUEUEPINGMESSAGE string
+
+# cf.SERVER server ID
+# cf.MATCHCATEGORY channel (category) ID
+# cf.QUEUECHANNEL channel ID
+# cf.RESULTSCHANNEL channel ID
+# cf.LOGCHANNEL channel ID
+# cf.rank_roles list of role IDs
 
 
 # Players / Matches
