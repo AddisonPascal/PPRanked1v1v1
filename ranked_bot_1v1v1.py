@@ -38,21 +38,6 @@ import cf
 # cf.rank_roles list of role IDs
 
 
-# Players / Matches
-players = {}
-current_matches = {}
-flagged_matches = {}
-historic_matches = {}
-
-# Queue
-queue_active = False
-queue_pairing = False
-queue_1_player = 0
-queue_1_join = 0
-queue_2_player = 0
-queue_2_join = 0
-
-
 class RankedState:
     def __init__(self, players=None, current_matches=None, flagged_matches=None, historic_matches=None):
 
