@@ -133,3 +133,16 @@ class Match:
     def is_confirmed(self):
         return len(self.confirmers)==3
         
+    def header(self, players):
+        names = []
+    
+        for pid in self.players:
+            names.append(players[pid].ign.replace("_", "\\_"))
+    
+        return "Match " + str(self.num) + "\n**" + names[0] + " vs " + names[1] + " vs " + names[2] + "**\n"
+     
+    def human(self, players):
+        if self.result is None:
+            return self.header(players) + "No results entered yet"
+    
+        return self.header(players) + self.result.human(self, players)
