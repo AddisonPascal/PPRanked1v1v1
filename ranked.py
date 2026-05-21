@@ -67,9 +67,12 @@ class Result:
             if pid in self.winners:
                 winner_names.append(players[pid].ign.replace("_", "\\_"))
     
+        out += "Game "+str(self.ties+1)+": "
         if len(winner_names) == 1:
+            out += winner_names[0] + " wins\n"
             out += "**Winner: " + winner_names[0] + "**"
         else:
+            out += winner_names[0] + " and "+winner_names[1]+" win\n"
             out += "**Winners: " + ", ".join(winner_names) + "**"
     
         return out
