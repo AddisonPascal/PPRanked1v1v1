@@ -51,20 +51,21 @@ queue_2_join = 0
 
 
 class RankedState:
-    def __init__(self, players={}, current_matches={}, flagged_matches={}, historic_matches={}):
-        self.players = players
-        self.current_matches = current_matches
-        self.flagged_matches = flagged_matches
-        self.historic_matches = historic_matches
-        
+    def __init__(self, players=None, current_matches=None, flagged_matches=None, historic_matches=None):
+
+        self.players = players or {}
+        self.current_matches = current_matches or {}
+        self.flagged_matches = flagged_matches or {}
+        self.historic_matches = historic_matches or {}
+
         self.queue_active = False
         self.queue_pairing = False
+
         self.queue_1_player = 0
         self.queue_1_join = 0
+
         self.queue_2_player = 0
         self.queue_2_join = 0
-        
-
 
 #def process_result(
 
