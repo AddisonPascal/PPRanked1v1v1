@@ -10,6 +10,8 @@ from ranked import Player, Match, Result, apply_match_stats
 
 import playerlookup
 
+import rating
+
 # Config file
 import cf
 
@@ -169,6 +171,9 @@ class MyClient(discord.Client):
     
     async def finalise_match(self, match: Match):
         match.end_time = time.time()
+        
+        apply_match_stats(match, state.players)
+        rating.apply_match_rating(match, state.players)
 
         if match.channel_id in state.current_matches:
             del state.current_matches[match.channel_id]
@@ -179,7 +184,6 @@ class MyClient(discord.Client):
         state.historic_matches[match.channel_id] = match
         
         
-        apply_match_stats(match, state.players)
         
         savedata()
 
