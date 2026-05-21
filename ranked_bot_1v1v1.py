@@ -603,3 +603,12 @@ class MyClient(discord.Client):
 
             await c_log.send("Player left queue: " + str(message.author.id))
             return
+            
+            
+             
+print("Loading")
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
+client = MyClient(intents=intents)
+client.run(cf.token)
