@@ -7,7 +7,7 @@ import random
 
 import trueskill
 
-import EloLookup
+import playerlookup
 
 # Config file
 import cf
