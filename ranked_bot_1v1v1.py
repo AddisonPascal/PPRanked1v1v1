@@ -24,6 +24,7 @@ import cf
 # cf.ADMINS list of user IDs
 # cf.VERIFIERS list of user IDs
 # cf.BANLIST list of user IDs
+# cf.BOTS list of user (bot) IDs
 
 # cf.QUEUEPINGMESSAGE string
 
@@ -266,7 +267,7 @@ class MyClient(discord.Client):
             return
             
         # Delete bot replies to queue commands
-        if message.author.id in [998175193778372659, 1263039458475901021]:
+        if message.author.id in cf.BOTS:
             if "you have left the queue" in message.content or "you are not in the queue" in message.content or "queue is closed right now" in message.content or "you are in an ongoing match" in message.content or "you are already in the queue" in message.content or "you have joined the queue" in message.content:
                 await asyncio.sleep(10)
                 try:
