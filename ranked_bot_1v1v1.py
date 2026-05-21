@@ -203,13 +203,22 @@ class MyClient(discord.Client):
                 player.rank = new_rank
                 player.rank_since_match = match.num
 
-                rank_messages.append(
-                    "<@" + str(pid) + "> is now " + cf.rank_names[new_rank] + "!"
-                )
+                if new_rank > old_rank:
+                    rank_messages.append(
+                        "<@" + str(pid) + "> has been promoted to " + cf.rank_names[new_rank] + "!"
+                    )
+                    log_word = "promoted"
+                else:
+                    rank_messages.append(
+                        "<@" + str(pid) + "> has been demoted to " + cf.rank_names[new_rank] + "."
+                    )
+                    log_word = "demoted"
 
                 await c_log.send(
                     str(pid)
-                    + " rank updated from "
+                    + " "
+                    + log_word
+                    + " from "
                     + cf.rank_names[old_rank]
                     + " to "
                     + cf.rank_names[new_rank]
