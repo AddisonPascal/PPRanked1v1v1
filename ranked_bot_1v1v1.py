@@ -156,6 +156,12 @@ def leaderboard_players(players):
         ),
         reverse=True
     )
+    
+def leaderboard_position(player_id, ranked_players):
+    for i, player in enumerate(ranked_players):
+        if player.discord_id == player_id:
+            return i
+    return None
         
 # Save data
 def savedata():
@@ -449,6 +455,67 @@ class MyClient(discord.Client):
                 embedVar.add_field(name=name, value=str(value))
 
             await message.channel.send(embed=embedVar)
+            return
+            
+            
+        # pp!lb - leaderboard
+        if message.content.startswith("pp!lb"):
+            ranked_players = leaderboard_players(state.players)
+
+            if len(ranked_players) == 0:
+                await message.channel.send("Leaderboard is empty.")
+                return
+
+            # Default: show top 10
+            if message.content == "pp!lb":
+                start = 0
+                end = min(10, len(ranked_players))
+                focus_id = None
+
+            # Mention version: show around mentioned player
+            else:
+                try:
+                    focus_id = message.mentions[0].id
+                except:
+                    await message.channel.send("Usage: `pp!lb` or `pp!lb @player`.")
+                    return
+
+                if focus_id not in state.players:
+                    await message.channel.send("That user is unranked.")
+                    return
+
+                pos = leaderboard_position(focus_id, ranked_players)
+
+                if pos is None:
+                    await message.channel.send("That user is not on the leaderboard.")
+                    return
+
+                start = max(0, pos - 5)
+                end = min(len(ranked_players), pos + 6)
+
+            msg = "## Leaderboard"
+
+            for i in range(start, end):
+                p = ranked_players[i]
+
+                line = (
+                    "\n#"
+                    + str(i + 1)
+                    + ": "
+                    + p.ign.replace("_", "\\_")
+                    + " ("
+                    + cf.rank_names[p.rank]
+                    + ")"
+                    + " — "
+                    + str(round(rating.display_rating(p), 2))
+                )
+
+                if focus_id == p.discord_id:
+                    line = "\n**" + line.strip() + "**"
+
+                msg += line
+
+            await message.channel.send(msg)
             return
             
             
