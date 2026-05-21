@@ -144,6 +144,19 @@ def ign(disc):
     except:
         return None
         
+        
+def leaderboard_players(players):
+    return sorted(
+        players.values(),
+        key=lambda p: (
+            p.rank,
+            rating.display_rating(p),
+            p.wins,
+            -p.losses,
+        ),
+        reverse=True
+    )
+        
 # Save data
 def savedata():
     data = [
