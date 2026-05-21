@@ -39,6 +39,15 @@ class Player:
     mu: float = 25
     sigma: float = 8.333333333333334
 
+
+
+@dataclass
+class Result:
+    voided: bool
+    ties: int
+    winners: set[int]
+    
+
 @dataclass
 class Match:
     num: int
@@ -59,9 +68,3 @@ class Match:
     def is_confirmed(self):
         return len(self.confirmers)==3
         
-@dataclass
-class Result:
-    voided: bool
-    ties: int
-    winners: set[int]
-    
