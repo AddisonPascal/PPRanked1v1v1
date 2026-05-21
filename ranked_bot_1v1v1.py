@@ -392,6 +392,45 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embedVar)
             return
             
+        # pp!flag - flag an active match for admin resolution
+        if message.content == "pp!flag":
+            if message.channel.id not in state.current_matches:
+                return
+
+            await message.channel.send(
+                "Are you sure you want to flag this match?\n"
+                "If you flag a match, no further games should be played in it, "
+                "but all players will be free to queue again.\n"
+                "If there is a dispute about results, ask an admin first.\n"
+                "If a player has left or hasn't shown up, make sure to give them at least 5 minutes before flagging.\n\n"
+                "To confirm, type `pp!flag confirm`."
+            )
+            return
+
+        if message.content == "pp!flag confirm":
+            if message.channel.id not in state.current_matches:
+                return
+
+            match = state.current_matches[message.channel.id]
+
+            state.flagged_matches[message.channel.id] = state.current_matches.pop(message.channel.id)
+            savedata()
+
+            await c_log.send(
+                "Match "
+                + str(match.num)
+                + " flagged by "
+                + str(message.author.id)
+                + " in channel "
+                + str(message.channel.id)
+            )
+
+            await message.channel.send(
+                "The match has been flagged. An admin will resolve the problem.\n"
+                "All players are now free to queue again."
+            )
+
+            return
             
         # pp!score - enter or confirm match results
         if message.content.startswith("pp!score"):
