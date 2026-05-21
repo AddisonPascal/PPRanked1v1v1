@@ -26,6 +26,8 @@ import cf
 # cf.BANLIST list of user IDs
 # cf.BOTS list of user (bot) IDs
 
+# cf.OWNER user ID
+
 # cf.QUEUEPINGMESSAGE string
 
 # cf.SERVER server ID
@@ -287,7 +289,7 @@ class MyClient(discord.Client):
             
         # pp!run admin command
         if message.content.startswith("pp!run!"):
-            if message.author.id != 374496541819404299:
+            if message.author.id != cf.OWNER:
                 await message.channel.send("You do not have permission to do that!")
                 return
             try:
@@ -298,7 +300,7 @@ class MyClient(discord.Client):
                 
         # pp!echo admin command
         if message.content.startswith("pp!echo!"):
-            if message.author.id != 374496541819404299:
+            if message.author.id != cf.OWNER:
                 await message.channel.send("You do not have permission to do that!")
                 return
             try:
