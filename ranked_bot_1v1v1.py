@@ -177,7 +177,7 @@ async def try_delete(message):
         pass
         
 async def try_delete_after(message, seconds):
-    await asyncio.sleep(10)
+    await asyncio.sleep(seconds)
     await try_delete(message)
         
 # Discord bot
