@@ -401,7 +401,7 @@ class MyClient(discord.Client):
                 "Are you sure you want to flag this match?\n"
                 "If you flag a match, no further games should be played in it, "
                 "but all players will be free to queue again.\n"
-                "If there is a dispute about results, ask an admin first.\n"
+                "If there is a dispute about results or restarts, ask a Referee for a decision, do not flag the match.\n"
                 "If a player has left or hasn't shown up, make sure to give them at least 5 minutes before flagging.\n\n"
                 "To confirm, type `pp!flag confirm`."
             )
