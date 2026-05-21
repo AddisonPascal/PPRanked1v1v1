@@ -121,12 +121,25 @@ def savedata():
     global historic_matches
     data = [players, current_matches, flagged_matches, historic_matches]
     pickle.dump(data, open('data.pickle', 'wb'))
+    
+    
+    
+async def try_delete(message):
+    try:
+        await message.delete()
+    except:
+        pass
+        
+async def try_delete_after(message, seconds):
+    await asyncio.sleep(10)
+    await try_delete(message)
         
 # Discord bot
 class MyClient(discord.Client):
     
     async def finalise_match(match: Match):
         ...
+        
     
     # Init
     async def on_ready(self):
@@ -302,46 +315,33 @@ class MyClient(discord.Client):
                     "<@" + str(message.author.id) + ">, you may not join the queue as you are currently banned from Ranked."
                 )
                 await c_log.send("Banned player attempted to queue: " + str(message.author.id))
-                try:
-                    await message.delete()
-                except:
-                    pass
+                
+                await try_delete(message)
+                
                 return
         
             if not state.queue_active:
                 await message.channel.send("The queue is closed right now.")
-                try:
-                    await message.delete()
-                except:
-                    pass
+                await try_delete(message)
                 return
         
             if state.player_in_current_match(message.author.id):
                 await message.channel.send(
                     "<@" + str(message.author.id) + ">, you are in an ongoing match. You cannot queue until that match is complete."
                 )
-                try:
-                    await message.delete()
-                except:
-                    pass
+                await try_delete(message)
                 return
         
             if state.in_queue(message.author.id):
                 await message.channel.send(
                     "<@" + str(message.author.id) + ">, you are already in the queue."
                 )
-                try:
-                    await message.delete()
-                except:
-                    pass
+                await try_delete(message)
                 return
         
             if state.queue_pairing:
                 await message.channel.send("A match is currently starting so you may not join the queue.")
-                try:
-                    await message.delete()
-                except:
-                    pass
+                await try_delete(message)
                 return
         
             # Create player if they do not exist
@@ -357,10 +357,7 @@ class MyClient(discord.Client):
                             "<@" + str(message.author.id) + ">, you may not join the queue as you are not verified."
                         )
                         await c_log.send("Player rejected from joining database: " + str(message.author.id))
-                        try:
-                            await message.delete()
-                        except:
-                            pass
+                        await try_delete(message)
                         return
         
                     pign = nick.split(" ")[-1]
@@ -456,10 +453,7 @@ class MyClient(discord.Client):
                     + "C: " + state.players[pC].ign.replace("_", "\\_")
                 )
         
-                try:
-                    await message.delete()
-                except:
-                    pass
+                await try_delete(message)
         
                 return
         
@@ -480,11 +474,8 @@ class MyClient(discord.Client):
             await message.channel.send(
                 "<@" + str(message.author.id) + ">, you have joined the queue! Do `pp!leave` to leave."
             )
-        
-            try:
-                await message.delete()
-            except:
-                pass
+            
+            await try_delete(message)
         
             await c_log.send("Player joined queue: " + str(message.author.id))
             return
