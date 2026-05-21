@@ -369,6 +369,39 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embedVar)
             return
             
+            
+        if message.content.startswith("pp!user"):
+            if message.content == "pp!user":
+                pid = message.author.id
+            else:
+                try:
+                    pid = message.mentions[0].id
+                except:
+                    pid = message.author.id
+
+            if pid not in state.players:
+                await message.channel.send("User is unranked! Do `pp!join` to join the queue.")
+                return
+
+            p = state.players[pid]
+
+            embed = discord.Embed(
+                title=p.ign.replace("_", "\\_"),
+                description="**Ranked Info**",
+                color=0xff0000
+            )
+
+            embed.add_field(name="Rank", value=cf.rank_names[p.rank])
+            embed.add_field(name="Match Wins", value=str(p.wins))
+            embed.add_field(name="Match Ties", value=str(p.ties))
+            embed.add_field(name="Match Losses", value=str(p.losses))
+            embed.add_field(name="Time in Queue", value=str(math.floor(p.queuetime / 60)) + " min")
+
+            embed.set_thumbnail(url="https://mc-heads.net/avatar/" + p.ign)
+
+            await message.channel.send(embed=embed)
+            return
+            
         # pp!match - admin inspect match by match number or channel id
         if message.content.startswith("pp!match "):
             if message.author.id not in cf.ADMINS:
