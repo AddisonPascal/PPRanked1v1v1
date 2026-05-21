@@ -368,6 +368,60 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embedVar)
             return
             
+            
+        # pp!score - enter or confirm match results
+        if message.content.startswith("pp!score"):
+            if message.channel.id not in state.current_matches:
+                await message.channel.send("This is not an active match channel.")
+                return
+
+            match = state.current_matches[message.channel.id]
+
+            if not match.has_player(message.author.id):
+                await message.channel.send("You are not a player in this match.")
+                return
+
+            args = message.content[len("pp!score"):].strip()
+
+            if args == "":
+                await message.channel.send("Usage: `pp!score a`, `pp!score ab`, `pp!score tt c`, or `pp!score confirm`.")
+                return
+
+            if args.lower() == "confirm":
+                if match.result is None:
+                    await message.channel.send("No result has been entered yet.")
+                    return
+
+                if not match.confirm(message.author.id):
+                    await message.channel.send("You have already confirmed these results.")
+                    
+                
+                if match.is_confirmed():
+                    await self.finalise_match(match)
+                else:
+                    savedata()
+                    await message.channel.send("You have confirmed these results.")
+
+                return
+
+            result = Result.parse(
+                args,
+                match,
+                is_admin=False
+            )
+
+            if result is None:
+                await message.channel.send("<@"+str(message.author.id)+">, those results are invalid. Please use the correct format. ")
+                return
+
+            match.result = result
+            match.confirmers = {message.author.id}
+            savedata()
+
+            await message.channel.send("Entered Results: \n"+result.human(match, state.players)+"\nPlease confirm these results by typing `pp!score confirm`. If there is a mistake enter results again with `pp!score`")
+
+            return
+            
          
         if message.content == "pp!join":
             if message.author.id in cf.BANLIST:

@@ -128,7 +128,9 @@ class Match:
         return player_id in self.players
         
     def confirm(self, player_id):
+        already_confirmed = player_id in self.confirmers
         self.confirmers.add(player_id)
+        return not already_confirmed
         
     def is_confirmed(self):
         return len(self.confirmers)==3
