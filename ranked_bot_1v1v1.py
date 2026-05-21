@@ -50,6 +50,14 @@ queue_2_player = 0
 queue_2_join = 0
 
 
+class RankedState:
+    def __init__(self):
+        self.players = {}
+        self.current_matches = {}
+        self.flagged_matches = {}
+        self.historic_matches = {}
+        
+
 
 #def process_result(
 
@@ -81,8 +89,6 @@ def savedata():
     global historic_matches
     data = [players, current_matches, flagged_matches, historic_matches]
     pickle.dump(data, open('data.pickle', 'wb'))
-        
-        
         
 # Discord bot
 class MyClient(discord.Client):
