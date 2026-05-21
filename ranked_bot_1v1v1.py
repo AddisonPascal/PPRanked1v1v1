@@ -90,6 +90,51 @@ class RankedState:
 
         self.queue_2_player = 0
         self.queue_2_join = 0
+        
+
+    def add_to_queue(self, player_id):
+        if self.queue_1_player == 0:
+            self.queue_1_player = player_id
+            self.queue_1_join = time.time()
+            return
+    
+        if self.queue_2_player == 0:
+            self.queue_2_player = player_id
+            self.queue_2_join = time.time()
+            return
+    
+        raise RuntimeError("Queue is already full")
+    
+    
+    def remove_from_queue(self, player_id):
+        if self.queue_1_player == player_id:
+            self.queue_1_player = 0
+            self.queue_1_join = 0
+            return True
+    
+        if self.queue_2_player == player_id:
+            self.queue_2_player = 0
+            self.queue_2_join = 0
+            return True
+    
+        return False
+    
+    
+    def player_in_current_match(self, player_id):
+        for match in self.current_matches.values():
+            if match.has_player(player_id):
+                return True
+    
+        return False
+    
+    
+    def next_match_num(self):
+        return (
+            len(self.current_matches)
+            + len(self.flagged_matches)
+            + len(self.historic_matches)
+            + 1
+        )
 
 #def process_result(
 
