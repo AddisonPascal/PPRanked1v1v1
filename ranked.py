@@ -1,0 +1,1 @@
+# this file will have the classes and everything so the bot is just for bot stuff
