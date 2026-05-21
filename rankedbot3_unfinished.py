@@ -59,6 +59,18 @@ class Player:
         self.mu = mu
         self.sigma = sigma
         
+class Match:
+    def __init__(self, a_id, b_id, c_id, a_confirmed, b_confirmed, c_confirmed, result, start_time, end_time):
+        self.a_id = a_id
+        self.b_id = b_id
+        self.c_id = c_id
+        self.a_confirmed = a_confirmed
+        self.b_confirmed = b_confirmed
+        self.c_confirmed = c_confirmed
+        self.result = result
+        self.start_time = start_time
+        self.end_time = end_time
+        
 class Result:
     def __init__(self, voided, num_ties, a_won, b_won, c_won):
         self.voided = voided
