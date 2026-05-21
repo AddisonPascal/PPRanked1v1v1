@@ -196,8 +196,17 @@ class MyClient(discord.Client):
 
         channel = self.get_channel(match.channel_id)
         if channel is not None:
-            await channel.delete(reason="Match finalised")
-            
+            try:
+                await channel.delete(reason="Match finalised")
+            except Exception as e:
+                await c_log.send(
+                    "Failed to delete match channel for Match "
+                    + str(match.num)
+                    + ": "
+                    + repr(e)
+                )
+
+
     # Init
     async def on_ready(self):
         global boot_time
