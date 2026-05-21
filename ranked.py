@@ -47,6 +47,42 @@ class Result:
     ties: int
     winners: set[int]
     
+    @classmethod
+    def parse(cls, string, match, is_admin=False):
+        voided = False
+        ties = 0
+        winners = set()
+
+        for char in string:
+            match char.lower():
+                case "t":
+                    ties += 1
+                case "a":
+                    winners.add(match.players[0])
+                case "b":
+                    winners.add(match.players[1])
+                case "c":
+                    winners.add(match.players[2])
+                case "v":
+                    if is_admin: voided = True
+                case " " | "\n" | "\t":
+                    pass
+                case _:
+                    return None
+
+        if ties > 5: return None
+
+        if voided: return cls(voided=True, ties=ties, winners=winners)
+
+        if ties == 5:
+            if len(winners) != 0: return None
+            return cls(voided=False, ties=5, winners=set())
+
+        if len(winners) == 0: return None
+
+        if len(winners) == 3: return None
+
+        return cls(voided=False, ties=ties, winners=winners)
 
 @dataclass
 class Match:
