@@ -139,7 +139,7 @@ class RankedState:
 #def process_result(
 
 # Load data file
-if True:
+if False:
     try:
         dat = pickle.load(open('data.pickle', 'rb'))
         
