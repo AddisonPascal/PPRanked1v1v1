@@ -146,7 +146,7 @@ def rank_for_player(player_id: int, players, historic_matches):
     # Gold and above: TrueSkill-based.
     score = display_rating(player)
 
-    if score >= GRANDMASTER_RATING
+    if score >= GRANDMASTER_RATING:
         return 6
 
     if score >= MASTER_RATING:
