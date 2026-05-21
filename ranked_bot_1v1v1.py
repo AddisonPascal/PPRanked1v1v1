@@ -239,8 +239,6 @@ class MyClient(discord.Client):
         c_match = self.get_channel(cf.MATCHCATEGORY)
         s_server = self.get_guild(cf.SERVER)
         
-        #s_comm = self.get_guild(cf.COMMUNITYSERVER)
-        
         await c_log.send("1v1v1 Bot Ready")
         
       
