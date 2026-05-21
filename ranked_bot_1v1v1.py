@@ -392,6 +392,45 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embedVar)
             return
             
+        # pp!match - admin inspect match by match number or channel id
+        if message.content.startswith("pp!match "):
+            if message.author.id not in cf.ADMINS:
+                await message.channel.send("You do not have permission to do that!")
+                return
+
+            try:
+                query = int(message.content[len("pp!match "):].strip())
+            except:
+                await message.channel.send("Usage: `pp!match <match number or channel id>`")
+                return
+
+            found = False
+
+            for label, db in [
+                ("current_matches", state.current_matches),
+                ("flagged_matches", state.flagged_matches),
+                ("historic_matches", state.historic_matches),
+            ]:
+                for channel_id, match in db.items():
+                    if query == channel_id or query == match.num:
+                        found = True
+
+                        msg = (
+                            "Found in `" + label + "`:\n"
+                            + "Channel ID: `" + str(channel_id) + "`\n"
+                            + match.human(state.players)
+                        )
+
+                        if label != "historic_matches":
+                            msg += "\nChannel: <#" + str(channel_id) + ">"
+
+                        await message.channel.send(msg)
+
+            if not found:
+                await message.channel.send("No match found with that match number or channel ID.")
+
+            return
+            
         # pp!flag - flag an active match for admin resolution
         if message.content == "pp!flag":
             if message.channel.id not in state.current_matches:
