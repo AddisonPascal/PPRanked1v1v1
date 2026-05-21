@@ -101,13 +101,13 @@ class Result:
                 case _:
                     return None
 
-        if ties > 5: return None
+        if ties > 3: return None
 
         if voided: return cls(voided=True, ties=ties, winners=winners)
 
-        if ties == 5:
+        if ties == 3:
             if len(winners) != 0: return None
-            return cls(voided=False, ties=5, winners=set())
+            return cls(voided=False, ties=3, winners=set())
 
         if len(winners) == 0: return None
 
