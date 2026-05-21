@@ -248,17 +248,7 @@ class MyClient(discord.Client):
     # On Message
     async def on_message(self, message):
         global boot_time
-        global players
-        global current_matches
-        global flagged_matches
-        global historic_matches
-        global queue_active
-        global queue_pairing
-        global queue_1_player
-        global queue_1_join
-        global queue_2_player
-        global queue_2_join
-        
+        global state
         
         # Delete messages in queue channel if not admin or queue command
         if message.channel.id==cf.QUEUECHANNEL and message.content not in ['pp!join', 'pp!leave'] and message.author.id not in cf.ADMINS:
