@@ -34,7 +34,6 @@ env = trueskill.TrueSkill(
 def player_rating(player: Player):
     return env.Rating(mu=player.mu, sigma=player.sigma)
 
-
 def apply_match_rating(match: Match, players: dict[int, Player]):
     result = match.result
 
@@ -54,23 +53,23 @@ def apply_match_rating(match: Match, players: dict[int, Player]):
         else:
             losers.append(pid)
 
-    # Snapshot ratings before the match.
+    # Snapshot ratings before the match so pairwise update order does not matter.
     old = {}
 
     for pid in match.players:
         p = players[pid]
-        old[pid] = env.Rating(mu=p.mu, sigma=p.sigma)
+        old[pid] = player_rating(p)
 
-    # Accumulate pairwise deltas, but do not apply them yet.
     delta_mu = {}
     delta_sigma = {}
-    appearances = {}
 
     for pid in match.players:
         delta_mu[pid] = 0
         delta_sigma[pid] = 0
-        appearances[pid] = 0
 
+    # Every winner is rated as beating every loser.
+    # For a solo win: winner beats 2 players.
+    # For a shared win: each winner beats the 1 loser.
     for winner_id in winners:
         for loser_id in losers:
             new_winner_group, new_loser_group = env.rate(
@@ -83,20 +82,27 @@ def apply_match_rating(match: Match, players: dict[int, Player]):
 
             delta_mu[winner_id] += new_winner.mu - old[winner_id].mu
             delta_sigma[winner_id] += new_winner.sigma - old[winner_id].sigma
-            appearances[winner_id] += 1
 
             delta_mu[loser_id] += new_loser.mu - old[loser_id].mu
             delta_sigma[loser_id] += new_loser.sigma - old[loser_id].sigma
-            appearances[loser_id] += 1
 
-    # Average deltas per comparison so a solo win is not twice as explosive.
+    # There are 2 winner-vs-loser comparisons in every decisive 1v1v1 match.
+    # Weight 0.75 gives average per-player match weight of 1:
+    #
+    # Solo win:
+    # winner gets 2 * 0.75 = 1.5
+    # each loser gets 0.75
+    #
+    # Shared win:
+    # each winner gets 0.75
+    # lone loser gets 2 * 0.75 = 1.5
+    PAIRWISE_WEIGHT = 0.75
+
     for pid in match.players:
-        if appearances[pid] == 0:
-            continue
-
         p = players[pid]
-        p.mu = old[pid].mu + delta_mu[pid] / appearances[pid]
-        p.sigma = old[pid].sigma + delta_sigma[pid] / appearances[pid]
+
+        p.mu = old[pid].mu + delta_mu[pid] * PAIRWISE_WEIGHT
+        p.sigma = old[pid].sigma + delta_sigma[pid] * PAIRWISE_WEIGHT
 
 def display_rating(player: Player):
     # Conservative TrueSkill estimate
