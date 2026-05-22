@@ -184,6 +184,10 @@ def current_unbeaten_streak_since_rank_start(player_id: int, players, historic_m
 
 def rank_for_player(player_id: int, players, historic_matches):
     player = players[player_id]
+    
+    # Grandmaster is permanent once achieved.
+    if player.rank == 6:
+        return 6
 
     # Starter -> Bronze: 3 completed matches.
     if player.rank == 0:
