@@ -38,7 +38,7 @@ class Player:
     queuetime: float = 0
     
     mu: float = 25
-    sigma: float = 8.333333333333334
+    sigma: float = 25/3
 
 
 

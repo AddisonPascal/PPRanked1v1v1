@@ -181,6 +181,39 @@ def signed_round(value, places=3):
 
     return str(rounded)
     
+def regenerate_trueskill_from_history():
+    # Reset every player's TrueSkill rating.
+    for player in state.players.values():
+        player.mu = 25
+        player.sigma = 25 / 3
+
+    # Replay completed matches in original order.
+    matches = list(state.historic_matches.values())
+    matches.sort(key=lambda match: match.num)
+
+    recalculated = 0
+    skipped = 0
+
+    for match in matches:
+        result = match.result
+
+        if result is None or result.voided or len(result.winners) == 0:
+            skipped += 1
+            continue
+
+        try:
+            rating.apply_match_rating(match, state.players)
+            recalculated += 1
+        except Exception as e:
+            raise RuntimeError(
+                "Failed while recalculating Match "
+                + str(match.num)
+                + ": "
+                + repr(e)
+            )
+
+    return recalculated, skipped
+    
     
 async def try_delete(message):
     try:
@@ -400,6 +433,40 @@ class MyClient(discord.Client):
         # Send discord server invite
         if message.content=="pp!invite":
             await message.channel.send("https://discord.gg/NwE75sqvxg")
+            
+            
+        if message.content == "pp!recalcratings":
+            if message.author.id != cf.OWNER:
+                await message.channel.send("You do not have permission to do that!")
+                return
+        
+            try:
+                recalculated, skipped = regenerate_trueskill_from_history()
+                savedata()
+        
+                await message.channel.send(
+                    "Recalculated TrueSkill ratings from history.\n"
+                    + "Rated matches replayed: "
+                    + str(recalculated)
+                    + "\nSkipped voided/tied/unrateable matches: "
+                    + str(skipped)
+                )
+        
+                await c_log.send(
+                    "TrueSkill ratings recalculated by "
+                    + str(message.author.id)
+                    + ". Rated matches replayed: "
+                    + str(recalculated)
+                    + ", skipped: "
+                    + str(skipped)
+                )
+        
+            except Exception as e:
+                await message.channel.send("Failed to recalculate ratings: `" + repr(e) + "`")
+                await c_log.send("Failed to recalculate ratings: " + repr(e))
+        
+            return
+
             
         # pp!run admin command
         if message.content.startswith("pp!run!"):
