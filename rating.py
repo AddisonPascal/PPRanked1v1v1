@@ -11,9 +11,28 @@ PLATINUM_RATING = 22
 MASTER_RATING = 24
 GRANDMASTER_RATING = 26
 
+# TrueSkill parameters
+TRUESKILL_MU = 25
+TRUESKILL_SIGMA = TRUESKILL_MU / 3
+
+# Higher beta = luckier/noisier game = slower rating movement.
+# Default-ish would be TRUESKILL_SIGMA / 2 = 25 / 6.
+TRUESKILL_BETA = TRUESKILL_MU / 4
+
+# Leave this alone for now.
+TRUESKILL_TAU = TRUESKILL_SIGMA / 100
+
+env = trueskill.TrueSkill(
+    mu=TRUESKILL_MU,
+    sigma=TRUESKILL_SIGMA,
+    beta=TRUESKILL_BETA,
+    tau=TRUESKILL_TAU,
+    draw_probability=0
+)
+
 
 def player_rating(player: Player):
-    return trueskill.Rating(mu=player.mu, sigma=player.sigma)
+    return env.Rating(mu=player.mu, sigma=player.sigma)
 
 
 def apply_match_rating(match: Match, players: dict[int, Player]):
@@ -26,23 +45,58 @@ def apply_match_rating(match: Match, players: dict[int, Player]):
     if result.voided or len(result.winners) == 0:
         return
 
-    rating_groups = []
-    ranks = []
+    winners = []
+    losers = []
 
     for pid in match.players:
-        rating_groups.append([player_rating(players[pid])])
-
         if pid in result.winners:
-            ranks.append(0)
+            winners.append(pid)
         else:
-            ranks.append(1)
+            losers.append(pid)
 
-    new_rating_groups = trueskill.rate(rating_groups, ranks=ranks)
+    # Snapshot ratings before the match.
+    old = {}
 
-    for pid, rating_group in zip(match.players, new_rating_groups):
-        new_rating = rating_group[0]
-        players[pid].mu = new_rating.mu
-        players[pid].sigma = new_rating.sigma
+    for pid in match.players:
+        p = players[pid]
+        old[pid] = env.Rating(mu=p.mu, sigma=p.sigma)
+
+    # Accumulate pairwise deltas, but do not apply them yet.
+    delta_mu = {}
+    delta_sigma = {}
+    appearances = {}
+
+    for pid in match.players:
+        delta_mu[pid] = 0
+        delta_sigma[pid] = 0
+        appearances[pid] = 0
+
+    for winner_id in winners:
+        for loser_id in losers:
+            new_winner_group, new_loser_group = env.rate(
+                [[old[winner_id]], [old[loser_id]]],
+                ranks=[0, 1]
+            )
+
+            new_winner = new_winner_group[0]
+            new_loser = new_loser_group[0]
+
+            delta_mu[winner_id] += new_winner.mu - old[winner_id].mu
+            delta_sigma[winner_id] += new_winner.sigma - old[winner_id].sigma
+            appearances[winner_id] += 1
+
+            delta_mu[loser_id] += new_loser.mu - old[loser_id].mu
+            delta_sigma[loser_id] += new_loser.sigma - old[loser_id].sigma
+            appearances[loser_id] += 1
+
+    # Average deltas per comparison so a solo win is not twice as explosive.
+    for pid in match.players:
+        if appearances[pid] == 0:
+            continue
+
+        p = players[pid]
+        p.mu = old[pid].mu + delta_mu[pid] / appearances[pid]
+        p.sigma = old[pid].sigma + delta_sigma[pid] / appearances[pid]
 
 def display_rating(player: Player):
     # Conservative TrueSkill estimate
