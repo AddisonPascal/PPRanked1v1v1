@@ -918,6 +918,7 @@ class MyClient(discord.Client):
                     "*In any disputes, ping a Referee in #ranked-chat. If someone leaves or doesn't show up, do `pp!flag`*"
                 )
         
+        
                 await c_results.send(
                     "Match " + str(match_num) + " started!\n\n"
                     + "A: " + state.players[pA].ign.replace("_", "\\_") + "\n"
@@ -925,12 +926,14 @@ class MyClient(discord.Client):
                     + "C: " + state.players[pC].ign.replace("_", "\\_")
                 )
                 
+                await c_log.send("Match started: "+str(message.channel.id))
                 
                 await message.channel.send(
                     "<@" + str(message.author.id) + ">, you have joined the queue! Match started."
                 )
         
                 await try_delete(message)
+                
                 
                 
         
