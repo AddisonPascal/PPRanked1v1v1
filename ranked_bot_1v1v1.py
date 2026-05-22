@@ -173,6 +173,13 @@ def savedata():
     ]
     pickle.dump(data, open("data.pickle", "wb"))
     
+def signed_round(value, places=3):
+    rounded = round(value, places)
+
+    if rounded >= 0:
+        return "+" + str(rounded)
+
+    return str(rounded)
     
     
 async def try_delete(message):
@@ -192,8 +199,52 @@ class MyClient(discord.Client):
         match.end_time = time.time()
 
         # Update player stats and ratings
+        rating_before = {}
+        
+        for pid in match.players:
+            p = state.players[pid]
+            rating_before[pid] = (
+                p.mu,
+                p.sigma,
+                rating.display_rating(p)
+            )
+        
         apply_match_stats(match, state.players)
         rating.apply_match_rating(match, state.players)
+        
+        rating_log = "Rating changes for Match " + str(match.num) + ":\n"
+        
+        for pid in match.players:
+            p = state.players[pid]
+        
+            old_mu, old_sigma, old_display = rating_before[pid]
+        
+            new_mu = p.mu
+            new_sigma = p.sigma
+            new_display = rating.display_rating(p)
+        
+            rating_log += (
+                p.ign
+                + ": mu "
+                + str(round(old_mu, 3))
+                + " -> "
+                + str(round(new_mu, 3))
+                + " ("
+                + signed_round(new_mu - old_mu, 3)
+                + "), sigma "
+                + str(round(old_sigma, 3))
+                + " -> "
+                + str(round(new_sigma, 3))
+                + " ("
+                + signed_round(new_sigma - old_sigma, 3)
+                + "), display "
+                + str(round(old_display, 3))
+                + " -> "
+                + str(round(new_display, 3))
+                + " ("
+                + signed_round(new_display - old_display, 3)
+                + ")\n"
+            )
 
         # Move match out of active/flagged and into history
         if match.channel_id in state.current_matches:
@@ -265,11 +316,15 @@ class MyClient(discord.Client):
                         )
 
         savedata()
+        
 
         await c_results.send(match.human(state.players))
 
         for msg in rank_messages:
             await c_results.send(msg)
+            
+        
+        await c_log.send(rating_log.replace("_", "\\_"))
 
         await c_log.send("Match " + str(match.num) + " finalised")
 
