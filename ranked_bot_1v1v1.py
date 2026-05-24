@@ -706,7 +706,9 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embed)
             return
             
-        # pp!match - admin inspect match by match number or channel id
+            
+            
+        # pp!match - inspect match by match number or channel id
         if message.content.startswith("pp!match "):
             if message.author.id not in cf.ADMINS:
                 await message.channel.send("You do not have permission to do that!")
