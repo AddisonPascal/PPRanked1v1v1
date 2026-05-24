@@ -144,6 +144,28 @@ def ign(disc):
     except:
         return None
         
+
+def queue_time_leaderboard(players):
+    ranked_players = sorted(
+        players.values(),
+        key=lambda p: p.queuetime,
+        reverse=True
+    )
+
+    msg = "## Queue Time Leaderboard"
+
+    for i, p in enumerate(ranked_players[:10]):
+        msg += (
+            "\n#"
+            + str(i + 1)
+            + ": "
+            + p.ign.replace("_", "\\_")
+            + " - "
+            + str(math.floor(p.queuetime / 60))
+            + " min"
+        )
+
+    return msg
         
 def leaderboard_players(players):
     return sorted(
