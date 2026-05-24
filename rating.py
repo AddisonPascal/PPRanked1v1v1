@@ -220,3 +220,116 @@ def rank_for_player(player_id: int, players, historic_matches):
         return 4
 
     return 3
+    
+    
+def rank_status_text(player_id: int, players, historic_matches, rank_names):
+    if player_id not in players:
+        return (
+            "Rank: Unranked\n"
+            "Join the queue for the first time to become Starter."
+        )
+
+    player = players[player_id]
+    rank_name = rank_names[player.rank]
+    score = display_rating(player)
+
+    msg = (
+        "Rank: " + rank_name + "\n"
+        "TrueSkill: " + str(round(score, 2))
+    )
+
+    # Starter -> Bronze
+    if player.rank == 0:
+        completed = completed_matches(player)
+        needed = max(0, BRONZE_MATCHES - completed)
+
+        msg += "\nCompleted matches: " + str(completed) + "/" + str(BRONZE_MATCHES)
+
+        if needed == 0:
+            msg += "\nYou are ready to reach " + rank_names[1] + "."
+        elif needed == 1:
+            msg += "\nYou need 1 more completed match to reach " + rank_names[1] + "."
+        else:
+            msg += "\nYou need " + str(needed) + " more completed matches to reach " + rank_names[1] + "."
+
+        return msg
+
+    # Bronze -> Silver
+    if player.rank == 1:
+        wins = wins_since_rank_start(
+            player_id,
+            players,
+            historic_matches
+        )
+        needed = max(0, SILVER_WINS_IN_BRONZE - wins)
+
+        msg += "\nWins while Bronze: " + str(wins) + "/" + str(SILVER_WINS_IN_BRONZE)
+
+        if needed == 0:
+            msg += "\nYou are ready to reach " + rank_names[2] + "."
+        elif needed == 1:
+            msg += "\nYou need 1 more win while Bronze to reach " + rank_names[2] + "."
+        else:
+            msg += "\nYou need " + str(needed) + " more wins while Bronze to reach " + rank_names[2] + "."
+
+        return msg
+
+    # Silver -> Gold
+    if player.rank == 2:
+        streak = current_unbeaten_streak_since_rank_start(
+            player_id,
+            players,
+            historic_matches
+        )
+        needed = max(0, GOLD_UNBEATEN_IN_SILVER - streak)
+
+        msg += "\nCurrent unbeaten streak while Silver: " + str(streak) + "/" + str(GOLD_UNBEATEN_IN_SILVER)
+
+        if needed == 0:
+            msg += "\nYou are ready to reach " + rank_names[3] + "."
+        elif needed == 1:
+            msg += "\nYou need 1 more unbeaten match while Silver to reach " + rank_names[3] + "."
+        else:
+            msg += "\nYou need " + str(needed) + " more unbeaten matches while Silver to reach " + rank_names[3] + "."
+
+        return msg
+
+    # Gold -> Platinum
+    if player.rank == 3:
+        needed = PLATINUM_RATING - score
+
+        if needed <= 0:
+            msg += "\nYou are ready to reach " + rank_names[4] + "."
+        else:
+            msg += "\nYou need +" + str(round(needed, 2)) + " TrueSkill to reach " + rank_names[4] + "."
+
+        return msg
+
+    # Platinum -> Master
+    if player.rank == 4:
+        needed = MASTER_RATING - score
+
+        if needed <= 0:
+            msg += "\nYou are ready to reach " + rank_names[5] + "."
+        else:
+            msg += "\nYou need +" + str(round(needed, 2)) + " TrueSkill to reach " + rank_names[5] + "."
+
+        return msg
+
+    # Master -> Grandmaster
+    if player.rank == 5:
+        needed = GRANDMASTER_RATING - score
+
+        if needed <= 0:
+            msg += "\nYou are ready to reach " + rank_names[6] + "."
+        else:
+            msg += "\nYou need +" + str(round(needed, 2)) + " TrueSkill to reach " + rank_names[6] + "."
+
+        return msg
+
+    # Grandmaster
+    if player.rank == 6:
+        msg += "\nYou cannot be demoted from this rank."
+        return msg
+
+    return msg
