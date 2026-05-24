@@ -6,7 +6,6 @@ import random
 from dataclasses import dataclass
 
 
-# Player class to hold player data
 @dataclass
 class Player:
     discord_id: int
@@ -80,7 +79,10 @@ class Result:
                 case "c":
                     winners.add(match.players[2])
                 case "v":
-                    if is_admin: voided = True
+                    if is_admin:
+                        voided = True
+                    else:
+                        return None
                 case " " | "\n" | "\t":
                     pass
                 case _:
@@ -165,6 +167,7 @@ def apply_match_stats(match: Match, players: dict[int, Player]):
         else:
             players[pid].losses += 1
             
+         
 def player_result_in_match(player_id, match):
     result = match.result
 
