@@ -735,6 +735,20 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embed)
             return
             
+        # pp!stats - get detailed player stats
+        if message.content.startswith("pp!stats"):
+            if message.content == "pp!stats":
+                pid = message.author.id
+            else:
+                try:
+                    pid = message.mentions[0].id
+                except:
+                    await message.channel.send("Usage: `pp!stats` or `pp!stats @player`.")
+                    return
+        
+            await message.channel.send(stats_message_for_player(pid))
+            return
+            
         # pp!rank - get progress to next rank
         if message.content == "pp!rank":
             pid = message.author.id
