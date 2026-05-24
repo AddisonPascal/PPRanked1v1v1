@@ -6,7 +6,7 @@ import time
 import random
 
 import ranked
-from ranked import Player, Match, Result, apply_match_stats, stats_for_player
+from ranked import Player, Match, Result, apply_match_stats, stats_for_player, stats_between_players
 
 import playerlookup
 
@@ -213,6 +213,41 @@ def stats_message_for_player(player_id: int):
     msg += "\n-# *(streaks ignore ties)*"
 
     msg += "\n\nW/L: " + str(round(stats["wins"] / losses, 2))
+
+    return msg
+    
+
+def stats_message_between_players(player_1_id: int, player_2_id: int):
+    if player_1_id == player_2_id:
+        return "Please mention two different players."
+
+    if player_1_id not in state.players or player_2_id not in state.players:
+        return "At least one user is unranked! Do `pp!join` to join the queue."
+
+    p1 = state.players[player_1_id]
+    p2 = state.players[player_2_id]
+
+    stats = stats_between_players(
+        player_1_id,
+        player_2_id,
+        state.players,
+        state.historic_matches
+    )
+ 
+    if stats is None:
+        return "At least one user is unranked! Do `pp!join` to join the queue."
+
+    p1_name = p1.ign.replace("_", "\\_")
+    p2_name = p2.ign.replace("_", "\\_")
+
+    msg = "## Stats for " + p1_name + " vs " + p2_name
+
+    msg += "\nWins for " + p1_name + ": " + str(stats["p1_wins"])
+    msg += "\nWins for " + p2_name + ": " + str(stats["p2_wins"])
+    msg += "\nTied Wins: " + str(stats["tied_wins"])
+    msg += "\nTied Losses: " + str(stats["tied_losses"])
+    msg += "\nMatch Ties: " + str(stats["match_ties"])
+    msg += "\nMatches Voided: " + str(stats["matches_voided"])
 
     return msg
         
