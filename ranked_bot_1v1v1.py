@@ -706,7 +706,19 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embed)
             return
             
-            
+        if message.content == "pp!rank":
+            pid = message.author.id
+        
+            await message.channel.send(
+                "<@" + str(pid) + ">\n"
+                + rating.rank_status_text(
+                    pid,
+                    state.players,
+                    state.historic_matches,
+                    cf.rank_names
+                )
+            )
+            return
             
         # pp!match - inspect match by match number or channel id
         if message.content.startswith("pp!match "):
