@@ -42,7 +42,6 @@ import cf
 
 class RankedState:
     def __init__(self, players=None, current_matches=None, flagged_matches=None, historic_matches=None):
-
         self.players = players or {}
         self.current_matches = current_matches or {}
         self.flagged_matches = flagged_matches or {}
@@ -62,13 +61,8 @@ class RankedState:
 
     def queue_players(self):
         out = []
-
-        if self.queue_1_player:
-            out.append(self.queue_1_player)
-
-        if self.queue_2_player:
-            out.append(self.queue_2_player)
-
+        if self.queue_1_player: out.append(self.queue_1_player)
+        if self.queue_2_player: out.append(self.queue_2_player)
         return out
 
     def in_queue(self, player_id):
@@ -81,50 +75,36 @@ class RankedState:
         self.queue_2_player = 0
         self.queue_2_join = 0
         
-
     def add_to_queue(self, player_id):
         if self.queue_1_player == 0:
             self.queue_1_player = player_id
             self.queue_1_join = time.time()
             return
-    
         if self.queue_2_player == 0:
             self.queue_2_player = player_id
             self.queue_2_join = time.time()
             return
-    
         raise RuntimeError("Queue is already full")
-    
-    
+        
     def remove_from_queue(self, player_id):
         if self.queue_1_player == player_id:
             self.queue_1_player = 0
             self.queue_1_join = 0
             return True
-    
         if self.queue_2_player == player_id:
             self.queue_2_player = 0
             self.queue_2_join = 0
             return True
-    
         return False
-    
-    
+        
     def player_in_current_match(self, player_id):
         for match in self.current_matches.values():
-            if match.has_player(player_id):
-                return True
-    
+            if match.has_player(player_id): return True
         return False
     
-    
     def next_match_num(self):
-        return (
-            len(self.current_matches)
-            + len(self.flagged_matches)
-            + len(self.historic_matches)
-            + 1
-        )
+        return len(self.current_matches) + len(self.flagged_matches) + len(self.historic_matches) + 1
+        
 
 # Load data file
 try:
@@ -166,6 +146,7 @@ def queue_time_leaderboard(players):
         )
 
     return msg
+    
         
 def leaderboard_players(players):
     return sorted(
@@ -179,11 +160,13 @@ def leaderboard_players(players):
         reverse=True
     )
     
+    
 def leaderboard_position(player_id, ranked_players):
     for i, player in enumerate(ranked_players):
         if player.discord_id == player_id:
             return i
     return None
+        
         
 # Save data
 def savedata():
@@ -195,6 +178,7 @@ def savedata():
     ]
     pickle.dump(data, open("data.pickle", "wb"))
     
+    
 def signed_round(value, places=3):
     rounded = round(value, places)
 
@@ -202,6 +186,7 @@ def signed_round(value, places=3):
         return "+" + str(rounded)
 
     return str(rounded)
+    
     
 def regenerate_trueskill_from_history():
     # Reset every player's TrueSkill rating.
@@ -243,9 +228,11 @@ async def try_delete(message):
     except:
         pass
         
+        
 async def try_delete_after(message, seconds):
     await asyncio.sleep(seconds)
     await try_delete(message)
+        
         
 # Discord bot
 class MyClient(discord.Client):
@@ -405,7 +392,6 @@ class MyClient(discord.Client):
         global c_results
         global s_server
         global c_match
-        global s_comm
         
         boot_time = time.time();
         
@@ -421,8 +407,7 @@ class MyClient(discord.Client):
         s_server = self.get_guild(cf.SERVER)
         
         await c_log.send("1v1v1 Bot Ready")
-        
-      
+
         
     # On Message
     async def on_message(self, message):
@@ -439,7 +424,7 @@ class MyClient(discord.Client):
             
         # Delete bot replies to queue commands
         if message.author.id in cf.BOTS:
-            if "you have left the queue" in message.content or "you are not in the queue" in message.content or "queue is closed right now" in message.content or "you are in an ongoing match" in message.content or "you are already in the queue" in message.content or "you have joined the queue" in message.content:
+            if "you have left the queue" in message.content or "you are not in the queue" in message.content or "queue is closed right now" in message.content or "you are in an ongoing match" in message.content or "you are already in the queue" in message.content or "you have joined the queue" in message.content:                
                 await asyncio.sleep(10)
                 try:
                     await message.delete()
@@ -456,7 +441,7 @@ class MyClient(discord.Client):
         if message.content=="pp!invite":
             await message.channel.send("https://discord.gg/NwE75sqvxg")
             
-            
+        # Recalculate TrueSkill ratings (not ranks)    
         if message.content == "pp!recalcratings":
             if message.author.id != cf.OWNER:
                 await message.channel.send("You do not have permission to do that!")
@@ -489,7 +474,6 @@ class MyClient(discord.Client):
         
             return
 
-            
         # pp!run admin command
         if message.content.startswith("pp!run!"):
             if message.author.id != cf.OWNER:
@@ -601,8 +585,7 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embedVar)
             return
             
-            
-        # Queue time leaderboard 
+        # pp!qlb - queue time leaderboard 
         if message.content == "pp!qlb":
             if len(state.players) == 0:
                 await message.channel.send("Queue time leaderboard is empty.")
@@ -706,6 +689,7 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embed)
             return
             
+        # pp!match - get progress to next rank
         if message.content == "pp!rank":
             pid = message.author.id
         
@@ -773,7 +757,8 @@ class MyClient(discord.Client):
                 "To confirm, type `pp!flag confirm`."
             )
             return
-
+    
+        # pp!flag confirm actually does it
         if message.content == "pp!flag confirm":
             if message.channel.id not in state.current_matches:
                 return
@@ -888,7 +873,7 @@ class MyClient(discord.Client):
             
             return
             
-         
+        # pp!join - join queue
         if message.content == "pp!join":
             if message.author.id in cf.BANLIST:
                 await message.channel.send(
@@ -1072,8 +1057,7 @@ class MyClient(discord.Client):
         
             await c_log.send("Player joined queue: " + str(message.author.id))
             return
-            
-            
+             
         # pp!leave - leave the queue
         if message.content == "pp!leave":
             if state.queue_pairing:
@@ -1133,8 +1117,8 @@ class MyClient(discord.Client):
             await c_log.send("Player left queue: " + str(message.author.id))
             return
             
-            
-             
+        
+# Run the bot        
 print("Loading")
 intents = discord.Intents.default()
 intents.message_content = True
