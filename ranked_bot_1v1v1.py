@@ -602,6 +602,15 @@ class MyClient(discord.Client):
             return
             
             
+        # Queue time leaderboard 
+        if message.content == "pp!qlb":
+            if len(state.players) == 0:
+                await message.channel.send("Queue time leaderboard is empty.")
+                return
+        
+            await message.channel.send(queue_time_leaderboard(state.players))
+            return
+            
         # pp!lb - leaderboard
         if message.content.startswith("pp!lb"):
             ranked_players = leaderboard_players(state.players)
