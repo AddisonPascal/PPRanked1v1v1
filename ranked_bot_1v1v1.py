@@ -808,10 +808,6 @@ class MyClient(discord.Client):
             
         # pp!match - inspect match by match number or channel id
         if message.content.startswith("pp!match "):
-            if message.author.id not in cf.ADMINS:
-                await message.channel.send("You do not have permission to do that!")
-                return
-
             try:
                 query = int(message.content[len("pp!match "):].strip())
             except:
