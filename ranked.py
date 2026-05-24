@@ -187,3 +187,97 @@ def player_result_in_match(player_id, match):
         return "win"
 
     return "loss"
+    
+    
+def stats_for_player(player_id: int, players: dict[int, Player], historic_matches: dict[int, Match]):
+    if player_id not in players:
+        return None
+
+    player = players[player_id]
+
+    stats = {
+        "wins": player.wins,
+        "ties": player.ties,
+        "losses": player.losses,
+
+        "matches_voided": 0,
+        "games_played": 0,
+        "games_tied": 0,
+
+        "solo_wins": 0,
+        "tied_wins": 0,
+        "tied_losses": 0,
+        "lone_losses": 0,
+
+        "best_winstreak": 0,
+        "worst_losing_streak": 0,
+        "current_streak": 0,
+
+        "last_played": None,
+    }
+
+    current_streak = 0
+
+    matches = list(historic_matches.values())
+    matches.sort(key=lambda match: match.num)
+
+    for match in matches:
+        if player_id not in match.players:
+            continue
+
+        result = match.result
+
+        if result is None:
+            continue
+
+        if result.voided:
+            stats["matches_voided"] += 1
+            stats["games_played"] += result.ties
+            stats["games_tied"] += result.ties
+
+            if result.ties > 0:
+                stats["last_played"] = match.end_time
+
+            continue
+
+        stats["last_played"] = match.end_time
+
+        # Full match tie: 3 tied games no winner no streak change.
+        if len(result.winners) == 0:
+            stats["games_played"] += result.ties
+            stats["games_tied"] += result.ties
+            continue
+
+        # Decisive match: tied games + final decisive game.
+        stats["games_played"] += result.ties + 1
+        stats["games_tied"] += result.ties
+
+        if player_id in result.winners:
+            if len(result.winners) == 1:
+                stats["solo_wins"] += 1
+            else:
+                stats["tied_wins"] += 1
+
+            current_streak = max(1, current_streak + 1)
+            stats["best_winstreak"] = max(
+                stats["best_winstreak"],
+                current_streak
+            )
+
+        else:
+            if len(result.winners) == 1:
+                # One winner, so this player was one of two tied losers.
+                stats["tied_losses"] += 1
+            else:
+                # Two winners, so this player was the only loser.
+                stats["lone_losses"] += 1
+
+            current_streak = min(-1, current_streak - 1)
+            stats["worst_losing_streak"] = min(
+                stats["worst_losing_streak"],
+                current_streak
+            )
+
+    stats["current_streak"] = current_streak
+
+    return stats
