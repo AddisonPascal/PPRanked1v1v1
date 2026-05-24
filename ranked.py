@@ -5,22 +5,6 @@ import random
 
 from dataclasses import dataclass
 
-## Player format
-# discord_id: {'ign': 'ign', 'rank': 0, 'wins': 0, 'ties': 0, 'losses': 0, 'queuetime': 0, 'mu': 25, 'sigma': 8.333333333333334}
-
-## Match format
-# old:
-# match_channel_id: {'p1': piq_id, 'p2': message.author.id, 'confirming': False, 'confirmer': 0, 'result': "", 'starttime': time.time(), 'endtime': 0}
-# new:
-# match_channel_id: {'num': match_num, 'pA': pA_id, 'pB': pB_id, 'pC': pC_id, 'pD': pD_id,
-#                   'confAB': False, 'confCD': False, 'result': "", 'starttime': time, 'endtime': time}
-
-# 1v1v1:
-# match_channel_id: {'num': match_num, 'pA': pA_id, 'pB': pB_id, 'pC': pC_id, 'confA': False, 'confB': False, 'confC': False, 'result': "", starttime: time,
-#                   endtime: time)
-
-# Results:
-# (voided, num_ties, a_won, b_won, c_won)
 
 # Player class to hold player data
 @dataclass
