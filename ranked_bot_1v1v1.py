@@ -735,7 +735,7 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embed)
             return
             
-        # pp!match - get progress to next rank
+        # pp!rank - get progress to next rank
         if message.content == "pp!rank":
             pid = message.author.id
         
