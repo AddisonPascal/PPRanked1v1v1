@@ -6,7 +6,7 @@ import time
 import random
 
 import ranked
-from ranked import Player, Match, Result, apply_match_stats
+from ranked import Player, Match, Result, apply_match_stats, stats_for_player
 
 import playerlookup
 
@@ -166,6 +166,55 @@ def leaderboard_position(player_id, ranked_players):
         if player.discord_id == player_id:
             return i
     return None
+        
+
+def stats_message_for_player(player_id: int):
+    if player_id not in state.players:
+        return "User is unranked! Do `pp!join` to join the queue."
+
+    player = state.players[player_id]
+
+    stats = stats_for_player(
+        player_id,
+        state.players,
+        state.historic_matches
+    )
+
+    if stats is None:
+        return "User is unranked! Do `pp!join` to join the queue."
+
+    if stats["last_played"] is None:
+        last_played = "Never"
+    else:
+        last_played = "<t:" + str(round(stats["last_played"])) + ":R>"
+
+    losses = max(1, stats["losses"])
+
+    msg = "## Stats for " + player.ign.replace("_", "\\_") + ":"
+
+    msg += "\n\nMatch Wins: " + str(stats["wins"])
+    msg += "\nMatch Ties: " + str(stats["ties"])
+    msg += "\nMatch Losses: " + str(stats["losses"])
+    msg += "\nMatches Voided: " + str(stats["matches_voided"])
+    msg += "\nLast Played: " + last_played
+
+    msg += "\n\nGames Played: " + str(stats["games_played"])
+    msg += "\nGames Tied: " + str(stats["games_tied"])
+
+    msg += "\n\nSolo Wins: " + str(stats["solo_wins"])
+    msg += "\nTied Wins: " + str(stats["tied_wins"])
+
+    msg += "\n\nTied Losses: " + str(stats["tied_losses"])
+    msg += "\nLone Losses: " + str(stats["lone_losses"])
+
+    msg += "\n\nBest Winstreak: " + str(stats["best_winstreak"])
+    msg += "\nWorst Losing Streak: " + str(-1 * stats["worst_losing_streak"])
+    msg += "\nCurrent Streak: " + str(stats["current_streak"])
+    msg += "\n-# *(streaks ignore ties)*"
+
+    msg += "\n\nW/L: " + str(round(stats["wins"] / losses, 2))
+
+    return msg
         
         
 # Save data
