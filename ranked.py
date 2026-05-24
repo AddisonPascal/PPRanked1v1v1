@@ -281,3 +281,54 @@ def stats_for_player(player_id: int, players: dict[int, Player], historic_matche
     stats["current_streak"] = current_streak
 
     return stats
+    
+    
+def stats_between_players(player_1_id: int, player_2_id: int, players: dict[int, Player], historic_matches: dict[int, Match]):
+    if player_1_id not in players or player_2_id not in players:
+        return None
+
+    stats = {
+        "p1_wins": 0,
+        "p2_wins": 0,
+        "tied_wins": 0,
+        "tied_losses": 0,
+        "match_ties": 0,
+        "matches_voided": 0,
+    }
+
+    matches = list(historic_matches.values())
+    matches.sort(key=lambda match: match.num)
+
+    for match in matches:
+        if player_1_id not in match.players:
+            continue
+
+        if player_2_id not in match.players:
+            continue
+
+        result = match.result
+
+        if result is None:
+            continue
+
+        if result.voided:
+            stats["matches_voided"] += 1
+            continue
+
+        if len(result.winners) == 0:
+            stats["match_ties"] += 1
+            continue
+
+        p1_won = player_1_id in result.winners
+        p2_won = player_2_id in result.winners
+
+        if p1_won and p2_won:
+            stats["tied_wins"] += 1
+        elif p1_won:
+            stats["p1_wins"] += 1
+        elif p2_won:
+            stats["p2_wins"] += 1
+        else:
+            stats["tied_losses"] += 1
+
+    return stats
