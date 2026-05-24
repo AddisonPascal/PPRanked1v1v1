@@ -359,13 +359,11 @@ class MyClient(discord.Client):
 
         savedata()
         
-
         await c_results.send(match.human(state.players))
 
         for msg in rank_messages:
             await c_results.send(msg)
             
-        
         await c_log.send(rating_log.replace("_", "\\_"))
 
         await c_log.send("Match " + str(match.num) + " finalised")
@@ -416,26 +414,25 @@ class MyClient(discord.Client):
         
         # Delete messages in queue channel if not admin or queue command
         if message.channel.id==cf.QUEUECHANNEL and message.content not in ['pp!join', 'pp!leave'] and message.author.id not in cf.ADMINS:
-            try:
-                await message.delete()
-            except:
-                pass
+            await try_delete(message)
             return
-            
+                    
         # Delete bot replies to queue commands
         if message.author.id in cf.BOTS:
-            if "you have left the queue" in message.content or "you are not in the queue" in message.content or "queue is closed right now" in message.content or "you are in an ongoing match" in message.content or "you are already in the queue" in message.content or "you have joined the queue" in message.content:                
-                await asyncio.sleep(10)
-                try:
-                    await message.delete()
-                except:
-                    pass
-            if "you may not join the queue" in message.content or "cannot leave the queue" in message.content:
-                try:
-                    await asyncio.sleep(10)
-                    await message.delete()
-                except:
-                    pass
+            auto_delete_phrases = [
+                "you have left the queue",
+                "you are not in the queue",
+                "queue is closed right now",
+                "you are in an ongoing match",
+                "you are already in the queue",
+                "you have joined the queue",
+                "you may not join the queue",
+                "cannot leave the queue",
+            ]
+        
+            if any(phrase in message.content for phrase in auto_delete_phrases):
+                await try_delete_after(message, 10)
+                return
                     
         # Send discord server invite
         if message.content=="pp!invite":
