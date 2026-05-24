@@ -19,7 +19,7 @@ TRUESKILL_SIGMA = TRUESKILL_MU / 3
 # Default-ish would be TRUESKILL_SIGMA / 2 = 25 / 6.
 TRUESKILL_BETA = TRUESKILL_MU / 4
 
-# Leave this alone for now.
+# Tau = uncertainty added, don't change
 TRUESKILL_TAU = TRUESKILL_SIGMA / 100
 
 env = trueskill.TrueSkill(
@@ -33,6 +33,7 @@ env = trueskill.TrueSkill(
 
 def player_rating(player: Player):
     return env.Rating(mu=player.mu, sigma=player.sigma)
+
 
 def apply_match_rating(match: Match, players: dict[int, Player]):
     result = match.result
@@ -53,9 +54,8 @@ def apply_match_rating(match: Match, players: dict[int, Player]):
         else:
             losers.append(pid)
 
-    # Snapshot ratings before the match so pairwise update order does not matter.
+    # Store old ratings before change
     old = {}
-
     for pid in match.players:
         p = players[pid]
         old[pid] = player_rating(p)
@@ -93,7 +93,7 @@ def apply_match_rating(match: Match, players: dict[int, Player]):
     # winner gets 2 * 0.75 = 1.5
     # each loser gets 0.75
     #
-    # Shared win:
+    # Tied win:
     # each winner gets 0.75
     # lone loser gets 2 * 0.75 = 1.5
     PAIRWISE_WEIGHT = 0.75
@@ -103,6 +103,7 @@ def apply_match_rating(match: Match, players: dict[int, Player]):
 
         p.mu = old[pid].mu + delta_mu[pid] * PAIRWISE_WEIGHT
         p.sigma = old[pid].sigma + delta_sigma[pid] * PAIRWISE_WEIGHT
+
 
 def display_rating(player: Player):
     # Conservative TrueSkill estimate
