@@ -772,13 +772,20 @@ class MyClient(discord.Client):
             
         # pp!stats - get detailed player stats
         if message.content.startswith("pp!stats"):
+            if len(message.mentions) >= 2:
+                player_1_id = message.mentions[0].id
+                player_2_id = message.mentions[1].id
+        
+                await message.channel.send(stats_message_between_players(player_1_id, player_2_id))
+                return
+        
             if message.content == "pp!stats":
                 pid = message.author.id
             else:
                 try:
                     pid = message.mentions[0].id
                 except:
-                    await message.channel.send("Usage: `pp!stats` or `pp!stats @player`.")
+                    await message.channel.send("Usage: `pp!stats`, `pp!stats @player`, or `pp!stats @player1 @player2`.")
                     return
         
             await message.channel.send(stats_message_for_player(pid))
