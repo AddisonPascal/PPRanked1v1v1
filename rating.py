@@ -1,6 +1,8 @@
+import copy
+
 import trueskill
 
-from ranked import Match, Player
+from ranked import Match, Player, Result, apply_match_stats
 
 # constants
 BRONZE_MATCHES = 3
@@ -364,3 +366,76 @@ def rank_status_text(player_id: int, players, historic_matches, rank_names):
         return msg
 
     return msg
+    
+    
+def rank_change_preview_text(match: Match, players, historic_matches, rank_names):
+    lines = []
+
+    def rank_after_hypothetical(result: Result, player_id: int):
+        test_players = copy.deepcopy(players)
+        test_history = dict(historic_matches)
+
+        test_match = Match(
+            num=match.num,
+            channel_id=match.channel_id,
+            players=list(match.players),
+            confirmers=set(match.players),
+            result=result,
+            start_time=match.start_time,
+            end_time=0
+        )
+
+        apply_match_stats(test_match, test_players)
+        apply_match_rating(test_match, test_players)
+
+        test_history[match.channel_id] = test_match
+
+        return rank_for_player(
+            player_id,
+            test_players,
+            test_history
+        )
+
+    for pid in match.players:
+        player = players[pid]
+        old_rank = player.rank
+
+        # Best case: this player is the only winner.
+        best_result = Result(
+            voided=False,
+            ties=0,
+            winners={pid}
+        )
+
+        # Worst case: the other two players win, so this player is the lone loser.
+        worst_result = Result(
+            voided=False,
+            ties=0,
+            winners=set(match.players) - {pid}
+        )
+
+        best_rank = rank_after_hypothetical(best_result, pid)
+        worst_rank = rank_after_hypothetical(worst_result, pid)
+
+        name = player.ign.replace("_", "\\_")
+
+        if best_rank > old_rank:
+            lines.append(
+                name
+                + " can promote to "
+                + rank_names[best_rank]
+                + " from this match."
+            )
+
+        if worst_rank < old_rank:
+            lines.append(
+                name
+                + " can demote to "
+                + rank_names[worst_rank]
+                + " from this match."
+            )
+
+    if len(lines) == 0:
+        return ""
+
+    return "## Rank stakes\n" + "\n".join(lines)
