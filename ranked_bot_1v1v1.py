@@ -928,10 +928,25 @@ class MyClient(discord.Client):
                 await message.channel.send("<@"+str(message.author.id)+">, those results are invalid. Please use the correct format. ")
                 return
 
+            # If the same result is entered again, treat it as confirmation, not as a new score entry.
+            if match.result == result:
+                if not match.confirm(message.author.id):
+                    await message.channel.send("You have already confirmed these results.")
+                    return
+            
+                if match.is_confirmed():
+                    await self.finalise_match(match)
+                else:
+                    savedata()
+                    await message.channel.send("You have confirmed these results.")
+            
+                return
+            
+            # Different result entered: replace the old result and reset confirmations.
             match.result = result
             match.confirmers = {message.author.id}
             savedata()
-
+            
             await message.channel.send("Entered Results: \n"+result.human(match, state.players)+"\nPlease confirm these results by typing `pp!score confirm`. If there is a mistake enter results again with `pp!score`")
             
             await c_log.send("Player "+str(message.author.id)+" entered results for "+str(message.channel.id))
