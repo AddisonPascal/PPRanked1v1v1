@@ -11,6 +11,8 @@ PLATINUM_RATING = 20
 MASTER_RATING = 23
 GRANDMASTER_RATING = 25
 
+MASTER_DEMOTION_BUFFER = 1
+
 # TrueSkill parameters
 TRUESKILL_MU = 25
 TRUESKILL_SIGMA = TRUESKILL_MU / 3
@@ -210,17 +212,23 @@ def rank_for_player(player_id: int, players, historic_matches):
 
     # Gold and above: TrueSkill-based.
     score = display_rating(player)
-
-    if score >= GRANDMASTER_RATING:
-        return 6
-
-    if score >= MASTER_RATING:
-        return 5
-
-    if score >= PLATINUM_RATING:
+    
+    # Gold -> Platinum requires PLATINUM_RATING
+    if player.rank == 3:
+        if score >= PLATINUM_RATING: return 4
+        return 3
+        
+    # Platinum -> Master requires MASTER_RATING, or demote at PLATINUM_RATING
+    if player.rank == 4:
+        if score >= MASTER_RATING: return 5
+        if score < PLATINUM_RATING: return 3
         return 4
-
-    return 3
+        
+    # Master -> Grandmaster requires GRANDMASTER_RATING, or demote at MASTER_RATING-MASTER_DEMOTION_BUFFER
+    if player.rank == 5:
+        if score >= GRANDMASTER_RATING: return 6
+        if score < MASTER_RATING-MASTER_DEMOTION_BUFFER: return 4
+        return 5
     
     
 def rank_status_text(player_id: int, players, historic_matches, rank_names):
