@@ -247,6 +247,22 @@ def rank_status_text(player_id: int, players, historic_matches, rank_names):
         "TrueSkill: " + str(round(score, 2))
     )
 
+    def add_demotion_text(msg, demotion_rating):
+        if demotion_rating is None:
+            return msg + "\nYou cannot be demoted from this rank."
+
+        drop_needed = score - demotion_rating
+
+        if drop_needed <= 0:
+            return msg + "\nYou are at risk of demoting from this rank."
+
+        return (
+            msg
+            + "\nYou need to lose "
+            + str(round(drop_needed, 2))
+            + " TrueSkill to demote."
+        )
+
     # Starter -> Bronze
     if player.rank == 0:
         completed = completed_matches(player)
@@ -261,6 +277,7 @@ def rank_status_text(player_id: int, players, historic_matches, rank_names):
         else:
             msg += "\nYou need " + str(needed) + " more completed matches to reach " + rank_names[1] + "."
 
+        msg = add_demotion_text(msg, None)
         return msg
 
     # Bronze -> Silver
@@ -281,6 +298,7 @@ def rank_status_text(player_id: int, players, historic_matches, rank_names):
         else:
             msg += "\nYou need " + str(needed) + " more wins while Bronze to reach " + rank_names[2] + "."
 
+        msg = add_demotion_text(msg, None)
         return msg
 
     # Silver -> Gold
@@ -301,6 +319,7 @@ def rank_status_text(player_id: int, players, historic_matches, rank_names):
         else:
             msg += "\nYou need " + str(needed) + " more unbeaten matches while Silver to reach " + rank_names[3] + "."
 
+        msg = add_demotion_text(msg, None)
         return msg
 
     # Gold -> Platinum
@@ -312,6 +331,7 @@ def rank_status_text(player_id: int, players, historic_matches, rank_names):
         else:
             msg += "\nYou need +" + str(round(needed, 2)) + " TrueSkill to reach " + rank_names[4] + "."
 
+        msg = add_demotion_text(msg, None)
         return msg
 
     # Platinum -> Master
@@ -323,6 +343,7 @@ def rank_status_text(player_id: int, players, historic_matches, rank_names):
         else:
             msg += "\nYou need +" + str(round(needed, 2)) + " TrueSkill to reach " + rank_names[5] + "."
 
+        msg = add_demotion_text(msg, PLATINUM_RATING)
         return msg
 
     # Master -> Grandmaster
@@ -334,11 +355,12 @@ def rank_status_text(player_id: int, players, historic_matches, rank_names):
         else:
             msg += "\nYou need +" + str(round(needed, 2)) + " TrueSkill to reach " + rank_names[6] + "."
 
+        msg = add_demotion_text(msg, MASTER_RATING - MASTER_DEMOTION_BUFFER)
         return msg
 
     # Grandmaster
     if player.rank == 6:
-        msg += "\nYou cannot be demoted from this rank."
+        msg = add_demotion_text(msg, None)
         return msg
 
     return msg
