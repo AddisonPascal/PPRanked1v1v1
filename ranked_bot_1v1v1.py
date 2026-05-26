@@ -1118,6 +1118,16 @@ class MyClient(discord.Client):
                     + "C: <@" + str(pC) + "> (" + state.players[pC].ign.replace("_", "\\_") + ")\n"
                 )
         
+                # Output possible rank changes
+                rank_preview = rating.rank_change_preview_text(
+                    match,
+                    state.players,
+                    state.historic_matches,
+                    cf.rank_names
+                )
+                if rank_preview != "":
+                    await channel.send(rank_preview)
+         
                 await channel.send(
                     "**Play your 1v1v1 match (normal mode no pwps) now!**\n"
                     "Whoever makes it to the furthest round wins the match (can be 2 people)! If there are 3 ties the match is tied.\n"
