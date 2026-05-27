@@ -436,6 +436,6 @@ def rank_change_preview_text(match: Match, players, historic_matches, rank_names
             )
 
     if len(lines) == 0:
-        return ""
+        return "*No rank changes are possible from this match.*"
 
-    return "## Rank stakes\n" + "\n".join(lines)
+    return "\n".join(lines)

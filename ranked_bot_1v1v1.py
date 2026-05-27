@@ -1125,8 +1125,8 @@ class MyClient(discord.Client):
                     state.historic_matches,
                     cf.rank_names
                 )
-                if rank_preview != "":
-                    await channel.send(rank_preview)
+                
+                await channel.send(rank_preview)
          
                 await channel.send(
                     "**Play your 1v1v1 match (normal mode no pwps) now!**\n"
@@ -1153,8 +1153,6 @@ class MyClient(discord.Client):
                 )
         
                 await try_delete(message)
-                
-                
                 
         
                 return
