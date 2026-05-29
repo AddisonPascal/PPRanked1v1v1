@@ -997,6 +997,32 @@ class MyClient(discord.Client):
                 await try_delete(message)
                 
                 return
+                
+            member = s_server.get_member(message.author.id)
+            
+            if member is None:
+                try:
+                    member = await s_server.fetch_member(message.author.id)
+                except discord.NotFound:
+                    await message.channel.send(
+                        "You must be in the Pixel Party Tournaments server to join the queue! https://discord.gg/NwE75sqvxg"
+                    )
+                    await c_log.send(
+                        "Player rejected from queue due to not being in tournament server: "
+                        + str(message.author.id)
+                    )
+                    return
+                except Exception as e:
+                    await message.channel.send(
+                        "Could not check whether you are in the Pixel Party Tournaments server (https://discord.gg/NwE75sqvxg). Please try again later."
+                    )
+                    await c_log.send(
+                        "Failed to check tournament server membership for "
+                        + str(message.author.id)
+                        + ": "
+                        + repr(e)
+                    )
+                    return
         
             if not state.queue_active:
                 await message.channel.send("The queue is closed right now.")
