@@ -618,6 +618,7 @@ class MyClient(discord.Client):
         
             await c_queue.send("The queue has been opened. Type `pp!join` to join!")
             await c_log.send("Admin queue open")
+            await c_queue.send(cf.QUEUEPINGMESSAGE)
             return
         
         # pp!close - close the queue
