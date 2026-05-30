@@ -322,6 +322,20 @@ async def try_delete_after(message, seconds):
 class MyClient(discord.Client):
     
     async def finalise_match(self, match: Match):
+        
+        channel = self.get_channel(match.channel_id)
+
+        if channel is not None:
+            try:
+                await channel.delete(reason="Match finalised")
+            except Exception as e:
+                await c_log.send(
+                    "Failed to delete match channel for Match "
+                    + str(match.num)
+                    + ": "
+                    + repr(e)
+                )
+
         match.end_time = time.time()
 
         # Update player stats and ratings
@@ -451,19 +465,6 @@ class MyClient(discord.Client):
         await c_log.send(rating_log.replace("_", "\\_"))
 
         await c_log.send("Match " + str(match.num) + " finalised")
-
-        channel = self.get_channel(match.channel_id)
-
-        if channel is not None:
-            try:
-                await channel.delete(reason="Match finalised")
-            except Exception as e:
-                await c_log.send(
-                    "Failed to delete match channel for Match "
-                    + str(match.num)
-                    + ": "
-                    + repr(e)
-                )
 
 
     # Init
