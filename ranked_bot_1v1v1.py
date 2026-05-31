@@ -254,13 +254,23 @@ def stats_message_between_players(player_1_id: int, player_2_id: int):
         
 # Save data
 def savedata():
-    data = [
-        state.players,
-        state.current_matches,
-        state.flagged_matches,
-        state.historic_matches
-    ]
-    pickle.dump(data, open("data.pickle", "wb"))
+    data = {
+        "players": players,
+        "queue": queue,
+        "matches": matches,
+        "historic_matches": historic_matches,
+    }
+
+    for attempt in range(10):
+        try:
+            with open("data.pickle", "wb") as f:
+                pickle.dump(data, f)
+            return
+
+        except PermissionError:
+            time.sleep(0.05)
+
+    print("WARNING: data was NOT saved")
     
     
 def signed_round(value, places=3):
