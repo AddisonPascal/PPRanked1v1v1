@@ -254,12 +254,12 @@ def stats_message_between_players(player_1_id: int, player_2_id: int):
         
 # Save data
 def savedata():
-    data = {
-        "players": players,
-        "queue": queue,
-        "matches": matches,
-        "historic_matches": historic_matches,
-    }
+    data = [
+        state.players,
+        state.current_matches,
+        state.flagged_matches,
+        state.historic_matches
+    ]
 
     for attempt in range(10):
         try:
