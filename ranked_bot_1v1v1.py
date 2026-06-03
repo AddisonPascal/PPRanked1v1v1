@@ -601,17 +601,8 @@ class MyClient(discord.Client):
                 return
             await m_mem.edit(nick=message.content.split(' ')[-1].replace('\\', ''))
             await message.channel.send("Verified user <@"+str(message.mentions[0].id)+">")
-            await c_log.send("User <@"+str(message.mentions[0].id)+"> verified by <@"+str(message.author.id)+">")
+            await c_log.send("User <@"+str(message.mentions[0].id)+"> verified by <@"+str(message.author.id)+">>\nType `pp!join` to join the queue!")
             return
-            try:
-                m_mem = s_server.get_member(message.mentions[0].id)
-                if m_mem.nick!=None:
-                    await message.channel.send("Cannot verify already verified user. ")
-                await m_mem.edit(nick=message.content.split(' ')[-1].replace('\\', ''))
-                await message.channel.send("Verified user <@"+str(message.mentions[0].id)+">\nType `pp!join` to join the queue!")
-                await c_log.send("User <@"+str(message.mentions[0].id)+"> verified by <@"+str(message.author.id)+">")
-            except:
-                await message.channel.send("Error verifying user. ")
                 
         # pp!open - open the queue
         if message.content == "pp!open":
