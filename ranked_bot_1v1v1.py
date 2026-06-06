@@ -601,7 +601,7 @@ class MyClient(discord.Client):
                 return
             await m_mem.edit(nick=message.content.split(' ')[-1].replace('\\', ''))
             await message.channel.send("Verified user <@"+str(message.mentions[0].id)+">")
-            await c_log.send("User <@"+str(message.mentions[0].id)+"> verified by <@"+str(message.author.id)+">>\nType `pp!join` to join the queue!")
+            await c_log.send("User <@"+str(message.mentions[0].id)+"> verified by <@"+str(message.author.id)+">>\nType `pp!join` to join the queue for a Ranked match!")
             return
                 
         # pp!open - open the queue
