@@ -1040,6 +1040,17 @@ class MyClient(discord.Client):
                 await message.channel.send("The queue is closed right now.")
                 await try_delete(message)
                 return
+                
+            if state.queue_pairing:
+                for _ in range(5):
+                    await asyncio.sleep(1)
+            
+                    if not state.queue_pairing:
+                        break
+                else:
+                    await message.channel.send("A match is currently starting so you may not join the queue.")
+                    await try_delete(message)
+                    return
         
             if state.player_in_current_match(message.author.id):
                 await message.channel.send(
@@ -1055,16 +1066,6 @@ class MyClient(discord.Client):
                 await try_delete(message)
                 return
         
-            if state.queue_pairing:
-                for _ in range(5):
-                    await asyncio.sleep(1)
-            
-                    if not state.queue_pairing:
-                        break
-                else:
-                    await message.channel.send("A match is currently starting so you may not join the queue.")
-                    await try_delete(message)
-                    return
         
             # Create player if they do not exist
             if message.author.id not in state.players:
