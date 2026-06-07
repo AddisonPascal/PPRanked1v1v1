@@ -302,7 +302,7 @@ def format_periods(period_points):
 def event_info_message(player_id, players, stats):
     msg = (
         "## " + cf_event.EVENT_NAME + "\n"
-        "Event time: <t:" + str(cf_event.EVENT_START) + ":F> to <t:" + str(cf_event.EVENT_END) + ":t>\n"
+        "Event time: <t:" + str(cf_event.EVENT_START) + ":R> to <t:" + str(cf_event.EVENT_END) + ":R>\n"
         "Queue in Ranked with `pp!join` during the event.\n"
         "See https://discord.com/channels/902158234591313960/902873146821079080/1511699885106270370\n\n"
         "Your event score is your **best 3** of the 4 hourly periods."
