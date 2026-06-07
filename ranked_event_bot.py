@@ -399,9 +399,6 @@ def games_leaderboard_message(players, stats):
             + " - **"
             + str(s["games_played"])
             + "** games"
-            + " ("
-            + str(s["matches_played"])
-            + " matches)"
         )
 
     return msg
