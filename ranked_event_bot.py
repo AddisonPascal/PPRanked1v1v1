@@ -321,7 +321,7 @@ def event_info_message(player_id, players, stats):
     s = stats[player_id]
 
     msg += (
-        "\n\n## <@"+str(player_id)"> Event Stats"
+        "\n\n## <@"+str(player_id)+"> Event Stats"
         "\nScore: **" + str(s["best_points"]) + "**"
         "\nAll periods: `" + format_periods(s["period_points"]) + "`"
         "\nGames played: **" + str(s["games_played"]) + "**"
