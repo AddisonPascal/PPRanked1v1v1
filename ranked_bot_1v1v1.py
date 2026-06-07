@@ -827,10 +827,19 @@ class MyClient(discord.Client):
                 for channel_id, match in db.items():
                     if query == channel_id or query == match.num:
                         found = True
+                        
+                        times_text = ""
+                        if match.start_time!=0:
+                            times_text += "Match Times: <t:"+str(round(match.start_time))+":F> to "
+                        if match.end_time!=0:
+                            times_text += "<t:"+str(round(match.end_time))+":t>\n"
+                        else:
+                            times_text += "(no result)\n"
 
                         msg = (
                             "Found in `" + label + "`:\n"
                             + "Channel ID: `" + str(channel_id) + "`\n"
+                            + times_text
                             + match.human(state.players)
                         )
 
