@@ -321,7 +321,7 @@ def event_info_message(player_id, players, stats):
     s = stats[player_id]
 
     msg += (
-        "\n\n## Your Event Stats"
+        "\n\n## <@"+str(player_id)"> Event Stats"
         "\nScore: **" + str(s["best_points"]) + "**"
         "\nAll periods: `" + format_periods(s["period_points"]) + "`"
         "\nGames played: **" + str(s["games_played"]) + "**"
@@ -348,7 +348,7 @@ def leaderboard_message(players, stats):
     previous_score = None
     previous_rank = 0
 
-    for index, item in enumerate(leaderboard[:15], start=1):
+    for index, item in enumerate(leaderboard, start=1):
         player_id, s = item
 
         if s["best_points"] == previous_score:
@@ -387,7 +387,7 @@ def games_leaderboard_message(players, stats):
     previous_games = None
     previous_rank = 0
 
-    for index, item in enumerate(leaderboard[:15], start=1):
+    for index, item in enumerate(leaderboard, start=1):
         player_id, s = item
 
         if s["games_played"] == previous_games:
@@ -446,7 +446,6 @@ class EventClient(discord.Client):
             "event",
             "eventlb",
             "eventgames",
-            "eventstatus",
             "eventreload",
         ]
 
