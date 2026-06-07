@@ -89,6 +89,43 @@ def event_period_index(start_time):
     return period
 
 
+def event_has_not_started():
+    return time.time() < cf_event.EVENT_START
+
+
+def unresolved_event_matches(cache):
+    matches = list(cache.current_matches.values()) + list(cache.flagged_matches.values())
+
+    count = 0
+
+    for match in matches:
+        if cf_event.EVENT_START <= match.start_time < cf_event.EVENT_END:
+            count += 1
+
+    return count
+
+
+def event_has_concluded(cache):
+    return (
+        cache.last_loaded > cf_event.EVENT_END
+        and unresolved_event_matches(cache) == 0
+    )
+
+def event_state_line(cache):
+    if event_has_not_started():
+        return "**Status:** Event has not started yet."
+
+    if event_has_concluded(cache):
+        return "**Status:** Event has finished."
+
+    if time.time() >= cf_event.EVENT_END:
+        return (
+            "**Status:** Event time has ended, but some matches haven't finished."
+        )
+
+    return "**Status:** Event is live."
+
+
 def blank_player_event_stats():
     return {
         "period_points": [0 for _ in range(cf_event.EVENT_PERIOD_COUNT)],
@@ -302,6 +339,7 @@ def format_periods(period_points):
 def event_info_message(player_id, players, stats):
     msg = (
         "## " + cf_event.EVENT_NAME + "\n"
+        + event_state_line(cache) + "\n"
         "Event time: <t:" + str(cf_event.EVENT_START) + ":R> to <t:" + str(cf_event.EVENT_END) + ":R>\n"
         "Queue in Ranked with `pp!join` during the event.\n"
         "See https://discord.com/channels/902158234591313960/902873146821079080/1511699885106270370\n\n"
@@ -402,7 +440,7 @@ def games_leaderboard_message(players, stats):
         )
 
     return msg
-
+    
 
 class EventClient(discord.Client):
     def __init__(self, **kwargs):
