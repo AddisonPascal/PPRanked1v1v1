@@ -336,7 +336,7 @@ def format_periods(period_points):
     return " / ".join(str(x) for x in period_points)
 
 
-def event_info_message(player_id, players, stats):
+def event_info_message(player_id, players, stats, cache):
     msg = (
         "## " + cf_event.EVENT_NAME + "\n"
         + event_state_line(cache) + "\n"
@@ -502,7 +502,8 @@ class EventClient(discord.Client):
                 event_info_message(
                     message.author.id,
                     self.cache.players,
-                    stats
+                    stats,
+                    self.cache
                 )
             )
             return
