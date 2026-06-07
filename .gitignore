@@ -182,3 +182,4 @@ cython_debug/
 cf.py
 data.pickle
 edb.csv
+cf_event.py
