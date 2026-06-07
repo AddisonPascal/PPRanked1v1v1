@@ -434,6 +434,9 @@ class EventClient(discord.Client):
 
         content = message.content.strip()
 
+        if message.channel.id==cf_event.QUEUECHANNEL:
+            return
+
         if not content.startswith(cf_event.PREFIX):
             return
 
