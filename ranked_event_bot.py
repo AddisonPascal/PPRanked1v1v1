@@ -371,7 +371,7 @@ def leaderboard_message(players, stats):
             + ")`"
         )
 
-    msg += "\n\n-# Score is best 3 hourly periods. Tied scores are broken randomly for prizes/finals."
+    msg += "\n\n-# Score is best 3 hourly periods."
 
     return msg
 
@@ -409,29 +409,6 @@ def games_leaderboard_message(players, stats):
             + str(s["matches_played"])
             + " matches)"
         )
-
-    msg += "\n\n-# If tied for the Hypixel rank upgrade, one tied player is randomly chosen."
-
-    return msg
-
-
-def event_status_message(cache):
-    if cache.last_loaded == 0:
-        cache_age = "Never loaded"
-    else:
-        cache_age = str(round(time.time() - cache.last_loaded)) + " seconds"
-
-    msg = (
-        "## Event Bot Status"
-        "\nLoaded players: " + str(len(cache.players))
-        + "\nHistoric matches: " + str(len(cache.historic_matches))
-        + "\nCurrent matches: " + str(len(cache.current_matches))
-        + "\nFlagged matches: " + str(len(cache.flagged_matches))
-        + "\nCache age: " + cache_age
-    )
-
-    if cache.last_error is not None:
-        msg += "\nLast error: `" + str(cache.last_error) + "`"
 
     return msg
 
@@ -515,10 +492,6 @@ class EventClient(discord.Client):
                     stats
                 )
             )
-            return
-
-        if command == "eventstatus":
-            await message.channel.send(event_status_message(self.cache))
             return
 
         if command == "eventreload":
