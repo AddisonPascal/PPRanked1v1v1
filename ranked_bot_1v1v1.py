@@ -1191,7 +1191,7 @@ class MyClient(discord.Client):
                     + "C: " + state.players[pC].ign.replace("_", "\\_")
                 )
                 
-                await c_log.send("Match started: "+str(message.channel.id))
+                await c_log.send("Match started: "+str(channel.id))
                 
                 await message.channel.send(
                     "<@" + str(message.author.id) + ">, you have joined the queue! Match started."
